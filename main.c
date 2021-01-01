@@ -313,18 +313,22 @@ int special_keys(char ch) {
      } else if(strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0) {
       if (currentLine + displayLength < scrollLimit) currentLine = currentLine + displayLength;
       else currentLine = scrollLimit;
+	scroll(filePtr);
  	update = 1;
      } else if(strcmp(chartrail, K_PAGEUP_TRAIL) == 0) {
        if (currentLine - displayLength > 1) currentLine = currentLine - displayLength;
  	else currentLine = 0;
+	scroll(filePtr);
 	update = 1;
      } else if(strcmp(chartrail, K_HOME_TRAIL) == 0 ||
 	      strcmp(chartrail, K_HOME_TRAIL2) == 0) {
 	currentLine = 0;
+	scroll(filePtr);
 	update = 1;
      } else if(strcmp(chartrail, K_END_TRAIL) == 0 ||
 	      strcmp(chartrail, K_END_TRAIL2) == 0) {
 	currentLine = scrollLimit;
+	scroll(filePtr);
 	update= 1;
      } else if(strcmp(chartrail, K_ALT_F) == 0) {
       data.index=FILE_MENU;
@@ -734,6 +738,10 @@ char cmsg[31] = "\nFile vieWer. Coded by v3l0r3k\n";
  }
 
  resetTerm();
+ outputcolor(B_BLUE,F_WHITE);
+ gotoxy(((scW/2)-10),1);
+ printf("%s\n",msg); 
+
  outputcolor(B_BLACK,F_BLACK);
  gotoxy(1,scH-2);
  for (i=0; i<scW;i++)
