@@ -238,7 +238,16 @@ int refresh_screen() {
   return 0;
 }
 void update_indicators(){
- if (strcmp(currentFile,"\0") == 0) {
+int i; 
+ for (i=1;i<scW; i++){
+       write_ch(i,2,' ',B_WHITE,F_WHITE);
+       write_ch(i,3,' ',B_BLACK,F_BLACK);
+   }
+  write_ch(scW,2,' ',B_WHITE,F_WHITE);
+  write_ch(scW,3,' ',B_BLACK,F_BLACK);
+
+  write_ch(12,2,NVER_LINE, B_WHITE,F_BLACK);
+  if (strcmp(currentFile,"\0") == 0) {
   	write_str(1,3,"No file open!",B_BLACK,F_WHITE);
     } else
     {
@@ -248,6 +257,7 @@ void update_indicators(){
   write_str(1, 2, "File  Help", B_WHITE, F_BLACK);
   write_str(1, 2, "F", B_WHITE, F_BLUE);
   write_str(7, 2, "H", B_WHITE, F_BLUE);
+  update_screen();
 }
 /*-----------------------------------------*/
 /* Manage keys that send a ESC sequence    */
@@ -367,7 +377,7 @@ void filetoDisplay(FILE *filePtr){
 			 i++;
 		}
  		else{
-		 write_ch(i,lineCounter+4,ch,BH_BLUE,F_WHITE);
+		 if (i<scW-1) write_ch(i,lineCounter+4,ch,BH_BLUE,F_WHITE);
 		  i++;
 		}
 	  }
@@ -384,7 +394,8 @@ void filetoDisplay(FILE *filePtr){
   write_str(1,scH-1,"- Lines:         | - Progress:    %", B_BLACK, F_WHITE); 
   progress = ((double) currentLine / (double) scrollLimit) * 100;
   write_num(10,scH-1,linesinFile,10, B_BLACK, F_YELLOW); 
-  write_num(32,scH-1,(int)progress,3, B_BLACK, F_YELLOW); 
+  if (scrollActive ==1) write_num(32,scH-1,(int)progress,3, B_BLACK, F_YELLOW); 
+  else  write_num(32,scH-1,100,3, B_BLACK, F_YELLOW);  
   //display system time
   time_str[strlen(time_str) - 1] = '\0';
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
@@ -414,7 +425,7 @@ void scroll(FILE *filePtr){
 			printf(">");
 			i++;
 		  } else{
-		    printf("%c",ch);
+		    if (i<scW-1) printf("%c",ch);
           	    i++;
 		} 
 	  }
@@ -439,7 +450,8 @@ void scroll(FILE *filePtr){
   printf("%ld", linesinFile); 
   gotoxy(32,scH-1);
   outputcolor(F_YELLOW,B_BLACK);
-  printf("%d", (int)progress); 
+  if (scrollActive == 1) printf("%d", (int)progress);
+  else printf("100"); 
 //  write_num(26,scH-1,progress,3, B_BLACK, F_YELLOW); 
  
 }
@@ -471,6 +483,7 @@ void check_arguments(int argc, char *argv[]){
       clearString(currentFile, MAX_TEXT);
       strcpy(fwfileName, argv[1]);
       getcwd(currentFile, sizeof(currentFile));	//Get path
+      strcat(currentFile, "/");
       strcat(currentFile, argv[1]);
       handleopenFile(&filePtr, fwfileName); 
     } else {	      
@@ -569,11 +582,11 @@ void filemenu() {
   }
   if(data.index == OPTION_3) {
     //External Module - Open file dialog.
-      strcpy(currentFile, "\0");
-      cleanString(currentFile, MAX_TEXT1);
-      cleanString(fwfileName, MAX_TEXT2);
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
+        strcpy(currentFile, "\0");
+        cleanString(currentFile, MAX_TEXT1);
+        cleanString(fwfileName, MAX_TEXT2);
         strcpy(currentFile, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
         handleopenFile(&filePtr, fwfileName);
@@ -581,14 +594,17 @@ void filemenu() {
       }
   }
   if(data.index == OPTION_2) {
-  count = inputWindow("New File:", tempFile, "Set file name");
-  if(count > 0) {
+    count = inputWindow("New File:", tempFile, "Set file name");
+    if(count > 0) {
     //cleanString(currentFile, MAX_TEXT1);
-    cleanString(fwfileName, MAX_TEXT2);
+     cleanString(fwfileName, MAX_TEXT2);
      strcpy(fwfileName, tempFile);
      handleopenFile(&filePtr, fwfileName);
+     getcwd(currentFile, sizeof(currentFile));	//Get path
+     strcat(currentFile, "/");
+     strcat(currentFile, fwfileName);
      update_indicators();
-  }
+    }
   }
   if(data.index == OPTION_4) {
  }
@@ -733,5 +749,6 @@ char cmsg[31] = "\nFile vieWer. Coded by v3l0r3k\n";
   resetAnsi(0);
   showcursor();
 }
+
 
 

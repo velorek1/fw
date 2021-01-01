@@ -38,7 +38,7 @@ int file_exists(char *fileName) {
 /*---------------*/
 
 long getfileSize(FILE * filePtr) {
-  long    sz;
+  long    sz=0;
   if(filePtr != NULL) {
     fseek(filePtr, 0L, SEEK_END);
     sz = ftell(filePtr);
@@ -147,7 +147,7 @@ int closeFile(FILE * filePtr) {
    Close file
 @return ok: 
 */
-  int     ok;
+  int     ok=0;
 
   if(filePtr != NULL) {
     ok = fclose(filePtr);
