@@ -22,7 +22,7 @@ long res, res2;
     get_ms = (ts.tv_nsec % 10000000) / 1000000;
     //Add a millisecond every time a change is detected in 10^-3
     res = get_ms-mytimer1->oldtime;
-    if(abs(res) >= 1){
+    if(labs(res) >= 1){
       mytimer1->elapsed = mytimer1->elapsed + 1;
       mytimer1->oldtime = get_ms;
     }

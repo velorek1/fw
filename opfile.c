@@ -90,7 +90,7 @@ int     window_x1 = 0, window_y1 = 0, window_x2 = 0, window_y2 = 0;
   char    fullPath[MAX];
   char	  fileName[MAX];
   char    newDir[MAX];
-int scW, scH;
+  int scWidth, scHeight;
 /*====================================================================*/
 /* CODE */
 /*====================================================================*/
@@ -507,7 +507,7 @@ char selectorMenu(LISTBOX * aux, SCROLLDATA * scrollData) {
     //scrollData->path = (char *)malloc(sizeof(char) *strlen(aux->path) + 1);
     gotoxy(1,3);
     outputcolor(B_BLACK, F_BLACK);
-    for (i=0; i<scW; i++)
+    for (i=0; i<scWidth; i++)
     printf(" ");
     scrollData->item = aux->item;
     scrollData->itemIndex = aux->index;
@@ -761,8 +761,8 @@ void openFileDialog(SCROLLDATA * openFileData) {
   int     exitFlag = 0;
   int     i,ok;
   int     rows, columns;
-  LISTCHOICE optionHandle;
-  get_terminal_dimensions(&scH, &scW);
+  //LISTCHOICE optionHandle;
+  get_terminal_dimensions(&scHeight, &scWidth);
 //init values
   scrollData.scrollActive=0;	//To know whether scroll is active or not.
   scrollData.scrollLimit=0;		//Last index for scroll.

@@ -29,12 +29,10 @@ LAST MODIFIED : 30/12/2020 - Adapted for FileViewer
 #define MAX_TEXT 150		//MENU CONSTANTS
 #define HOR_MENU -1
 #define FILE_MENU 0
-#define OPT_MENU 1
-#define HELP_MENU 2
+#define HELP_MENU 1
 #define YESNO_MENU 3
 #define OK_MENU 4
 #define OK_MENU2 5
-#define COLORS_MENU 6
 #define MAX_FILENAME 100
 
 //DROP-DOWN MENUS
@@ -87,20 +85,20 @@ void loadmenus(LISTCHOICE * mylist, int choice) {
   get_terminal_dimensions(&rows, &columns);
 
   if(choice == HOR_MENU) {
-    add_item(mylist, "File", 1, 1, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Help", 7, 1, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "File", 1, 2, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Help", 7, 2, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
   }
 
   if(choice == FILE_MENU) {
-    add_item(mylist, "Info", 3, 3, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Set file", 3, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Open dialog", 3, 5, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Search for", 3, 6,MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Exit", 3, 7, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "File Info", 2, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Set file", 2, 5, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Open file", 2, 6, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Search for", 2, 7,MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Exit", 2, 9, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
   }
   if(choice == HELP_MENU) {
-    add_item(mylist, "Help...", 18, 3, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "About", 18, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Help...", 8, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "About", 8, 5, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
   }
 
   if(choice == YESNO_MENU) {
@@ -270,8 +268,6 @@ int infoWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
 
 int alertWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   int     window_x1 = 0, window_y1 = 0, window_x2 = 0, window_y2 = 0;
-  int     tempx = 0;
-  int     titlex = 0;
   int     ok = 0;
   int     i = 0;
   int     ix = 0;
@@ -364,9 +360,6 @@ int yesnoWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
 
 int inputWindow(char *label, char *tempFile, char *windowTitle) {
   int     window_x1 = 0, window_y1 = 0, window_x2 = 0, window_y2 = 0;
-  int     i;
-  int     tempx = 0;
-  int     titlex = 0;
   int     count = 0;
   int     rows, columns;
 

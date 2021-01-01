@@ -290,12 +290,9 @@ int mapChartoU8(int character) {
 
 int screenChanged() {
 
-  int     i, wherex, wherey;
-  char    tempchar;
+  int     i;
   int     changed=0;
   SCREENCELL *aux, *aux2;
-  wherey = 1;
-  wherex = 1;
   aux = primary_start;
   aux2 = secondary_start; 
   for(i = 0; i <= buffersize; i++) {
@@ -470,7 +467,6 @@ char tempchar=0;
 
 void update_screen() {
   int     i, wherex, wherey;
-  char    tempchar;
   SCREENCELL *aux;
   wherey = 1;
   wherex = 0;
