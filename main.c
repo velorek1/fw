@@ -306,22 +306,45 @@ int special_keys(char ch) {
     } else if(strcmp(chartrail, K_DOWN_TRAIL) == 0) {
       //Down-arrow key 
  	if (scrollActive == 1){
-	   update =1;
+	   update = 1;
 	   if (currentLine<scrollLimit) currentLine++; 
 	   scroll(filePtr);
 	}
      } else if(strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0) {
-      //Page Down key 
+      if (currentLine + displayLength < scrollLimit) currentLine = currentLine + displayLength;
+      else currentLine = scrollLimit;
+ 	update = 1;
      } else if(strcmp(chartrail, K_PAGEUP_TRAIL) == 0) {
-      //Page Down key 
+       if (currentLine - displayLength > 1) currentLine = currentLine - displayLength;
+ 	else currentLine = 0;
+	update = 1;
+     } else if(strcmp(chartrail, K_HOME_TRAIL) == 0 ||
+	      strcmp(chartrail, K_HOME_TRAIL2) == 0) {
+	currentLine = 0;
+	update = 1;
+     } else if(strcmp(chartrail, K_END_TRAIL) == 0 ||
+	      strcmp(chartrail, K_END_TRAIL2) == 0) {
+	currentLine = scrollLimit;
+	update= 1;
      } else if(strcmp(chartrail, K_ALT_F) == 0) {
-      //data.index=FILE_MENU;
-      //drop_down(&kglobal);	//animation   
+      data.index=FILE_MENU;
+      drop_down(&kglobal);	//animation   
     } else if(strcmp(chartrail, K_ALT_H) == 0) {
-      //data.index=HELP_MENU;
-      //drop_down(&kglobal);	//animation  
+      data.index=HELP_MENU;
+      drop_down(&kglobal);	//animation  
     } else if(strcmp(chartrail, K_ALT_X) == 0) {
       return -1;
+    } else if(strcmp(chartrail, K_ALT_O) == 0) {
+      openFileDialog(&openFileData);
+      if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
+        strcpy(currentFile, "\0");
+        cleanString(currentFile, MAX_TEXT1);
+        cleanString(fwfileName, MAX_TEXT2);
+        strcpy(currentFile, openFileData.fullPath);
+        strcpy(fwfileName, openFileData.path);
+        handleopenFile(&filePtr, fwfileName);
+	update_indicators(); 
+      }
     }
   }
  return 0;
