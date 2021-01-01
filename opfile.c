@@ -803,7 +803,7 @@ void openFileDialog(SCROLLDATA * openFileData) {
     //Add items to list
     listFiles(&listBox1, newDir);
     ch = listBox(listBox1, window_x1 + 2, window_y1 + 1, &scrollData,
-		 B_WHITE, F_BLACK, B_CYAN, F_WHITE, 15);
+		 B_WHITE, F_BLACK, MENU_SELECTOR, MENU_FOREGROUND1, 15);
         
 
     //Scroll Loop exit conditions

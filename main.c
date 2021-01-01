@@ -322,7 +322,8 @@ int special_keys(char ch) {
 int handleopenFile(FILE ** filePtr, char *fwfileName) {
   long    checkF = 0;
   int     ok = 0;
-
+  currentLine = 0;
+  scrollLimit = 0;
   openFile(filePtr, fwfileName, "r");
   //Check for binary characters to determine filetype
   checkF = checkFile(*filePtr);
@@ -348,6 +349,7 @@ return 0;
 
 void filetoDisplay(FILE *filePtr){
   long     lineCounter = 0, i=1, whereinfile=0;
+  double progress=0;
   int k=0;
   char    ch;
   time_t  mytime = time(NULL);
@@ -379,9 +381,10 @@ void filetoDisplay(FILE *filePtr){
 	  if (lineCounter > scH-6) break;
     }
   //display metrics
-  write_str(1,scH-1,"- Lines:   | - Progress:    %", B_BLACK, F_WHITE); 
+  write_str(1,scH-1,"- Lines:         | - Progress:    %", B_BLACK, F_WHITE); 
+  progress = ((double) currentLine / (double) scrollLimit) * 100;
   write_num(10,scH-1,linesinFile,10, B_BLACK, F_YELLOW); 
-  write_num(26,scH-1,lineCounter,10, B_BLACK, F_YELLOW); 
+  write_num(32,scH-1,(int)progress,3, B_BLACK, F_YELLOW); 
   //display system time
   time_str[strlen(time_str) - 1] = '\0';
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
@@ -393,12 +396,14 @@ void filetoDisplay(FILE *filePtr){
 
 void scroll(FILE *filePtr){
   long    lineCounter = 0, i=1, whereinfile=0;
+  double    progress;
   char    ch;
   int k;
     //RAW output for smoother scroll
     rewind(filePtr);		//Make sure we are at the beginning
     whereinfile=gotoLine(filePtr,currentLine);
     if (whereinfile >1) fseek(filePtr, whereinfile, 0);
+
       while (!feof(filePtr)) {
 	  ch = getc(filePtr);
 	  outputcolor(F_WHITE,BH_BLUE);
@@ -424,6 +429,19 @@ void scroll(FILE *filePtr){
 	  }
 	  if (lineCounter > scH-6) break;
     }
+  //metrics
+  gotoxy(1,scH-1);
+  outputcolor(F_WHITE,B_BLACK);
+  printf("- Lines:         | - Progress:    %c",37);
+  progress = ((double) currentLine / (double) scrollLimit) * 100;
+  gotoxy(10,scH-1);
+  outputcolor(F_YELLOW,B_BLACK);
+  printf("%ld", linesinFile); 
+  gotoxy(32,scH-1);
+  outputcolor(F_YELLOW,B_BLACK);
+  printf("%d", (int)progress); 
+//  write_num(26,scH-1,progress,3, B_BLACK, F_YELLOW); 
+ 
 }
 
 void cleanArea(int raw){
@@ -496,7 +514,7 @@ void check_arguments(int argc, char *argv[]){
 }
 
 long checkScrollValues(){
-	return (linesinFile - displayLength) - 1;
+	return (linesinFile - displayLength);
 }
 
 /* --------------------------------------*/
