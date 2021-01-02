@@ -176,8 +176,9 @@ int i=0;
   write_ch(12,2,NVER_LINE, B_WHITE,F_BLACK);
   write_ch(1,2,'F',B_WHITE,F_BLUE);
   write_ch(7,2,'H',B_WHITE,F_BLUE);
-  write_str(1,scH,"F2: MENUS   ALT-X: EXIT" , B_WHITE,F_BLACK);
+  write_str(1,scH,"F2: MENUS   ALT-O: OPEN   ALT-X/CTRL-C: EXIT" , B_WHITE,F_BLACK);
   write_ch(11,scH,NVER_LINE , B_WHITE,F_BLACK);
+  write_ch(25,scH,NVER_LINE , B_WHITE,F_BLACK);
   write_str((scW/2) - 10, 1,msg,B_BLUE,F_WHITE);
   update_indicators();
   if (displayLogo == 1){
