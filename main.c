@@ -129,10 +129,32 @@ int keypressed=0;
      keypressed = 0;
      time_since_keypressed = 0;
      ch = readch();
+     //ESC-KEY related keys
      if (special_keys(ch) == -1) status = -1;
-     if (ch == K_CTRL_C) status = -1;
-     if (ch == 'a') {write_num(10,11,vdisplayLength,3,B_GREEN,F_WHITE); write_num(10,10,currentColumn,3,B_RED,F_WHITE); update_screen();}
-     if (ch == K_CTRL_L) {
+    //FAIL-SAFE ARROW KEYS
+    if (ch =='a') {
+      //Left-arrow key
+       if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
+    } 
+    if (ch =='d') {
+      //Right-arrow key
+       if(currentColumn < VERTICAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
+    }
+    if (ch =='w') {
+      //Up-arrow key
+       if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
+    } 
+    if (ch == 's') {
+      //Down-arrow key 
+ 	if (scrollActive == 1){
+	   if (currentLine<scrollLimit) currentLine++; 
+	   if (currentColumn > 1) cleanArea(1);
+	   scroll(filePtr);
+	}
+     }
+    
+    if (ch == K_CTRL_C) status = -1;
+    if (ch == K_CTRL_L) {
 	filetoDisplay(filePtr, currentLine, 1);
        if(horizontal_menu() == K_ESCAPE) {
  	//Exit horizontal menu with ESC 3x
@@ -142,12 +164,13 @@ int keypressed=0;
        drop_down(&kglobal);
      }
      } else{
+     
      if (filePtr != NULL && update == 1 && time_since_keypressed>1) {
 	//Screen buffer is updated here!
 	filetoDisplay(filePtr, currentLine, 1); 
 	update = 0;
 	time_since_keypressed = 0;
-     }
+     } 
      ch = 0;
    }
   } while (status != -1);
@@ -419,7 +442,7 @@ if (filePtr != NULL) {
     if (whereinfile>1) fseek(filePtr, whereinfile, 0);
     while (!feof(filePtr)) {
 	  ch = getc(filePtr);	
-	  wherex = abs(i-currentColumn);
+	  wherex = labs(i-currentColumn);
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9 || ch==13){//with vertical scroll
 			 if (i> currentColumn) write_ch(wherex,lineCounter+4,'>',BH_GREEN,F_WHITE);
@@ -440,12 +463,12 @@ if (filePtr != NULL) {
 	  if (lineCounter > scH-6) break;
     }
   //display metrics
-  write_str(1,scH-1,"- Lines:         | - Progress:    %  | - H.Scroll:    /500", B_BLACK, F_WHITE); 
+  write_str(1,scH-1,"- Lines:         | - Progress:    %  | - H:    /500", B_BLACK, F_WHITE); 
   progress = ((double) currentLine / (double) scrollLimit) * 100;
   write_num(10,scH-1,linesinFile,10, B_BLACK, F_YELLOW); 
   if (scrollActive ==1) write_num(32,scH-1,(int)progress,3, B_BLACK, F_YELLOW); 
   else  write_num(32,scH-1,100,3, B_BLACK, F_YELLOW);  
-  write_num(52,scH-1,currentColumn,3, B_BLACK, F_YELLOW); 
+  write_num(45,scH-1,currentColumn,3, B_BLACK, F_YELLOW); 
   //display system time
   time_str[strlen(time_str) - 1] = '\0';
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
@@ -471,7 +494,7 @@ if (filePtr != NULL) {
       while (!feof(filePtr)) {
 	  ch = getc(filePtr);
 	  outputcolor(F_WHITE,BH_BLUE);
-	  wherex = abs(i-currentColumn); 
+	  wherex = labs(i-currentColumn); 
           if (wherex < scW-1) gotoxy(abs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9 || ch==13){
@@ -499,7 +522,7 @@ if (filePtr != NULL) {
   //metrics
   gotoxy(1,scH-1);
   outputcolor(F_WHITE,B_BLACK);
-  printf("- Lines:         | - Progress:    %c  | - H.Scroll:    /500",37);
+  printf("- Lines:         | - Progress:    %c  | - H:    /500",37);
   progress = ((double) currentLine / (double) scrollLimit) * 100;
   gotoxy(10,scH-1);
   outputcolor(F_YELLOW,B_BLACK);
@@ -508,7 +531,7 @@ if (filePtr != NULL) {
   outputcolor(F_YELLOW,B_BLACK); 
   if (scrollActive == 1) printf("%d", (int)progress);
   else printf("100"); 
-  gotoxy(52,scH-1);
+  gotoxy(45,scH-1);
   outputcolor(F_YELLOW,B_BLACK);
   printf("%d", currentColumn); 
  
