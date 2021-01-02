@@ -10,6 +10,7 @@ TO BUILD AND RUN:
 FEATURES:
 - Millisecond timer for animations.
 - Rudimentary screen buffer. 
-- TUI with dialogs, pull-down menus and textbox.
 - Dynamic screen resizing.
+- TUI with dialogs, pull-down menus and textbox.
+- Open File Dialog with recursive filelisting.
 - ESC Key sequence managements.
