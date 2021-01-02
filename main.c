@@ -495,7 +495,7 @@ if (filePtr != NULL) {
 	  ch = getc(filePtr);
 	  outputcolor(F_WHITE,BH_BLUE);
 	  wherex = labs(i-currentColumn); 
-          if (wherex < scW-1) gotoxy(abs(i-currentColumn),lineCounter+4);
+          if (wherex < scW-1) gotoxy(labs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9 || ch==13){
 	  		outputcolor(F_WHITE,BH_GREEN);
