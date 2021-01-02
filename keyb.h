@@ -67,6 +67,7 @@ Last modified: 14/04/2019 Rename Headers
 #define K_ALT_O "\eo"
 #define K_ALT_W "\ew"
 #define K_ALT_A "\ea"
+#define K_ALT_I "\ei"
 #define K_ALT_C "\ec"
 #define K_ALT_F "\ef"
 #define K_ALT_P "\ep"

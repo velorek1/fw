@@ -17,7 +17,13 @@
 #define LINE14 "         f:::::::f                     w:::::w         w:::::w                 " 
 #define LINE15 "         f:::::::f                      w:::w           w:::w                  "    
 #define LINE16 "         fffffffff                       www             www                   "     
-                                                                                                                          
+       
+
+#define ALINE1 "          _____          \n"     
+#define ALINE2 "        _/ ____|_  _  __ \n"
+#define ALINE3 "        |   __|| |/ |/ / \n"
+#define ALINE4 "         |__|   |____/ \nFile vieWer - Coded by v3l0r3k\n\0"
+
 #define ABOUT_LENGTH 100
 #define ABOUT_LINES 16
                                                                                                           
@@ -41,6 +47,6 @@ char about_msg[ABOUT_LINES][ABOUT_LENGTH] =
 		 LINE15,
 		 LINE16
  		};                                                                                                                                                                    
-                                                                                              
+                                                                                                                                                                                               
                                                                                                           
 #endif

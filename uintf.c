@@ -93,8 +93,8 @@ void loadmenus(LISTCHOICE * mylist, int choice) {
     add_item(mylist, "File Info", 2, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
     add_item(mylist, "Set file", 2, 5, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
     add_item(mylist, "Open file", 2, 6, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Search for", 2, 7,MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
-    add_item(mylist, "Exit", 2, 9, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    //add_item(mylist, "Search for", 2, 7,MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
+    add_item(mylist, "Exit", 2, 8, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
   }
   if(choice == HELP_MENU) {
     add_item(mylist, "Help...", 8, 4, MENU_PANEL, MENU_FOREGROUND0, MENU_SELECTOR, MENU_FOREGROUND1);
@@ -291,7 +291,7 @@ int alertWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   for(i = 0; i < strlen(message); i++) {
     tempChar = message[i];
     //Maximum four lines
-    if(j < 4) {
+    if(j < 5) {
       //Split message if \n
       if(tempChar == '\n') {
 	j++;

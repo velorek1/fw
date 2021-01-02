@@ -29,12 +29,16 @@ int refresh_screen();
 int special_keys(char ch);
 int handleopenFile(FILE ** filePtr, char *fwfileName);
 void credits();
-void filetoDisplay(FILE *filePtr);
+void filetoDisplay(FILE *filePtr, long position, int scupdate);
 void scroll(FILE *filePtr);
 void check_arguments(int argc, char *argv[]);
 long checkScrollValues();
 void    drop_down(char *kglobal);
 char horizontal_menu();
+int fileInfoDialog();
+void about_info();
+void setfile();
+int help_info();
 void update_indicators();
 /* -----------------------------------*/
 //GLOBAL VARIABLES
@@ -126,6 +130,7 @@ int keypressed=0;
      if (special_keys(ch) == -1) status = -1;
      if (ch == K_CTRL_C) status = -1;
      if (ch == K_CTRL_L) {
+	filetoDisplay(filePtr, currentLine, 1);
        if(horizontal_menu() == K_ESCAPE) {
  	//Exit horizontal menu with ESC 3x
 	kglobal = K_ESCAPE;
@@ -136,7 +141,7 @@ int keypressed=0;
      } else{
      if (filePtr != NULL && update == 1 && time_since_keypressed>1) {
 	//Screen buffer is updated here!
-	filetoDisplay(filePtr); 
+	filetoDisplay(filePtr, currentLine, 1); 
 	update = 0;
 	time_since_keypressed = 0;
      }
@@ -147,6 +152,7 @@ int keypressed=0;
   credits();
   return 0;
 }
+
 
 /* --------------------------------------*/
 //DISPLAY
@@ -284,29 +290,23 @@ int special_keys(char ch) {
     if(strcmp(chartrail, K_F2_TRAIL) == 0 ||
        strcmp(chartrail, K_F2_TRAIL2) == 0) {
       //update screen
+      filetoDisplay(filePtr, currentLine,0);
       if(horizontal_menu() == K_ESCAPE) {
 	//Exit horizontal menu with ESC 3x
 	kglobal = K_ESCAPE;
 	main_screen();
       }
      drop_down(&kglobal);
-    } else if(strcmp(chartrail, K_F3_TRAIL) == 0 ||
-	      strcmp(chartrail, K_F3_TRAIL2) == 0) {
-      //refresh_screen(1);
     } else if(strcmp(chartrail, K_F1_TRAIL) == 0 ||
 	      strcmp(chartrail, K_F1_TRAIL2) == 0) {
-      //help_info();
-    } else if(strcmp(chartrail, K_F4_TRAIL) == 0 ||
-	      strcmp(chartrail, K_F4_TRAIL2) == 0) {
-      //about_info();
+      help_info(); 
       // ARROW KEYS   
     } else if(strcmp(chartrail, K_UP_TRAIL) == 0) {
       //Up-arrow key
-       if(currentLine >0) {update=1;currentLine--; scroll(filePtr);}
+       if(currentLine >0) {currentLine--; scroll(filePtr);}
     } else if(strcmp(chartrail, K_DOWN_TRAIL) == 0) {
       //Down-arrow key 
  	if (scrollActive == 1){
-	   update = 1;
 	   if (currentLine<scrollLimit) currentLine++; 
 	   scroll(filePtr);
 	}
@@ -314,31 +314,37 @@ int special_keys(char ch) {
       if (currentLine + displayLength < scrollLimit) currentLine = currentLine + displayLength;
       else currentLine = scrollLimit;
 	scroll(filePtr);
- 	update = 1;
      } else if(strcmp(chartrail, K_PAGEUP_TRAIL) == 0) {
        if (currentLine - displayLength > 1) currentLine = currentLine - displayLength;
  	else currentLine = 0;
 	scroll(filePtr);
-	update = 1;
      } else if(strcmp(chartrail, K_HOME_TRAIL) == 0 ||
 	      strcmp(chartrail, K_HOME_TRAIL2) == 0) {
 	currentLine = 0;
 	scroll(filePtr);
-	update = 1;
      } else if(strcmp(chartrail, K_END_TRAIL) == 0 ||
 	      strcmp(chartrail, K_END_TRAIL2) == 0) {
 	currentLine = scrollLimit;
 	scroll(filePtr);
-	update= 1;
      } else if(strcmp(chartrail, K_ALT_F) == 0) {
       data.index=FILE_MENU;
       drop_down(&kglobal);	//animation   
     } else if(strcmp(chartrail, K_ALT_H) == 0) {
       data.index=HELP_MENU;
       drop_down(&kglobal);	//animation  
+    } else if(strcmp(chartrail, K_ALT_I) == 0) {
+      filetoDisplay(filePtr, currentLine,0);
+      fileInfoDialog();
+    } else if(strcmp(chartrail, K_ALT_A) == 0) {
+      filetoDisplay(filePtr, currentLine,0);
+      about_info();
+    } else if(strcmp(chartrail, K_ALT_S) == 0) {
+      filetoDisplay(filePtr, currentLine,0);
+      setfile();
     } else if(strcmp(chartrail, K_ALT_X) == 0) {
       return -1;
     } else if(strcmp(chartrail, K_ALT_O) == 0) {
+      filetoDisplay(filePtr, currentLine,1);
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
         strcpy(currentFile, "\0");
@@ -384,7 +390,7 @@ int handleopenFile(FILE ** filePtr, char *fwfileName) {
 return 0;
 }
 
-void filetoDisplay(FILE *filePtr){
+void filetoDisplay(FILE *filePtr, long position,int scupdate){
   long     lineCounter = 0, i=1, whereinfile=0;
   double progress=0;
   int k=0;
@@ -392,6 +398,8 @@ void filetoDisplay(FILE *filePtr){
   time_t  mytime = time(NULL);
   char   *time_str = ctime(&mytime);
 //Update screen buffer 
+
+if (filePtr != NULL) {
     cleanArea(0);
     rewind(filePtr);		//Make sure we are at the beginning
     whereinfile=gotoLine(filePtr,currentLine);
@@ -429,7 +437,8 @@ void filetoDisplay(FILE *filePtr){
   //clean viewing area
   //cleanArea();
   //write to screen buffer
-  update_screen();
+  if (scupdate==1) update_screen();
+}
 }
 
 void scroll(FILE *filePtr){
@@ -437,6 +446,7 @@ void scroll(FILE *filePtr){
   double    progress;
   char    ch;
   int k;
+if (filePtr != NULL) {
     //RAW output for smoother scroll
     rewind(filePtr);		//Make sure we are at the beginning
     whereinfile=gotoLine(filePtr,currentLine);
@@ -480,7 +490,7 @@ void scroll(FILE *filePtr){
   if (scrollActive == 1) printf("%d", (int)progress);
   else printf("100"); 
 //  write_num(26,scH-1,progress,3, B_BLACK, F_YELLOW); 
- 
+} 
 }
 
 void cleanArea(int raw){
@@ -588,15 +598,14 @@ char horizontal_menu() {
 
 void filemenu() {  
   //cleanStatusBar();
-  int i=0,count=0;
-  char tempFile[MAX_TEXT];
+  int i=0;
   data.index = OPTION_NIL;
   //write_str(1, rows, STATUS_BAR_MSG2, STATUSBAR, STATUSMSG);
   loadmenus(mylist, FILE_MENU);
   write_str(1, 2, "File", MENU_SELECTOR, MENU_FOREGROUND1);
-  draw_window(1, 3, 13, 10, MENU_PANEL, MENU_FOREGROUND0,0, 1,0);
+  draw_window(1, 3, 13, 9, MENU_PANEL, MENU_FOREGROUND0,0, 1,0);
   for (i=2; i<13; i++)
-	write_ch(i,8,NHOR_LINE,B_WHITE,F_BLACK);
+	write_ch(i,7,NHOR_LINE,B_WHITE,F_BLACK);
   kglobal = start_vmenu(&data);
   close_window();
   update_indicators();
@@ -604,8 +613,8 @@ void filemenu() {
   free_list(mylist);
 
   if(data.index == OPTION_1) {
-    //New file option
-    //Update new global file name
+    //File info
+   fileInfoDialog();
   }
   if(data.index == OPTION_3) {
     //External Module - Open file dialog.
@@ -621,7 +630,20 @@ void filemenu() {
       }
   }
   if(data.index == OPTION_2) {
-    count = inputWindow("New File:", tempFile, "Set file name");
+	setfile();
+  }
+  if(data.index == OPTION_4) {
+	status = -1;
+  }
+  data.index = OPTION_NIL;
+  //cleanStatusBar();
+   //Restore message in status bar
+   //write_str(1, rows, STATUS_BAR_MSG1, STATUSBAR, STATUSMSG);
+}
+void setfile(){
+int count=0;
+ char tempFile[MAX_TEXT];
+   count = inputWindow("New File:", tempFile, "Set file name");
     if(count > 0) {
     //cleanString(currentFile, MAX_TEXT1);
      cleanString(fwfileName, MAX_TEXT2);
@@ -632,17 +654,6 @@ void filemenu() {
      strcat(currentFile, fwfileName);
      update_indicators();
     }
-  }
-  if(data.index == OPTION_4) {
- }
-
-  if(data.index == OPTION_5) {
-	status = -1;
-  }
-  data.index = OPTION_NIL;
-  //cleanStatusBar();
-   //Restore message in status bar
-   //write_str(1, rows, STATUS_BAR_MSG1, STATUSBAR, STATUSMSG);
 }
 /*--------------------------*/
 /* Display Help menu        */
@@ -664,12 +675,12 @@ void helpmenu() {
   update_screen();
   free_list(mylist);
   if(data.index == OPTION_1) {
-    //About info
-    //help_info();
+    //Help info
+    help_info();
   }
   if(data.index == OPTION_2) {
     //About info
-    //about_info();
+    about_info();
   }
   data.index = -1;
   //Restore message in status bar
@@ -712,6 +723,80 @@ void drop_down(char *kglobal) {
       }
     }
   } while(*kglobal != K_ENTER);
+}
+
+/*------------------*/
+/* File Info Dialog */
+/*------------------*/
+
+int fileInfoDialog() {
+  long    size = 0, lines = 0;
+  int     i;
+  char    sizeStr[12];
+  char    linesStr[12];
+  char    tempMsg[150];
+  char    pathtxt[60];
+  if(filePtr != NULL) {
+    //closeFile(filePtr);
+    //openFile(&filePtr, currentFile, "r");
+    size = getfileSize(filePtr);
+    lines = countLinesFile(filePtr);
+    if(size <= 0)
+      size = 0;
+    if(lines <= 0)
+      lines = 0;
+    sprintf(sizeStr, "%ld", size);
+    sprintf(linesStr, "%ld", lines);
+    strcpy(tempMsg, "[+] File Data:\n- ");
+    strcat(tempMsg, sizeStr);
+    strcat(tempMsg, " bytes.\n- ");
+    strcat(tempMsg, "");
+    strcat(tempMsg, linesStr);
+    strcat(tempMsg, " lines.\n[");
+    for (i=0;i<60;i++){
+        if (i!=31) pathtxt[i] = openFileData.fullPath[i];
+        else pathtxt[31] = '\n';
+    }
+    pathtxt[60] = CHAR_NIL;
+    strcat(tempMsg, pathtxt);
+    strcat(tempMsg, "]");
+    alertWindow(mylist, tempMsg, "File Information");
+  } else {
+    infoWindow(mylist, "No file open!", "File Information");
+  }
+  return 0;
+}
+
+void about_info(){
+  char    msg[200];
+  msg[0] = '\0';
+  strcat(msg, ALINE1);
+  strcat(msg, ALINE2);
+  strcat(msg, ALINE3);
+  strcat(msg, ALINE4);
+  //strcat(msg, "\0");
+  alertWindow(mylist, msg,"ABOUT");
+
+}
+int help_info() {
+  int     ok = 0;
+  char    msg[500];
+  msg[0] = '\0';
+  strcat(msg, HELP1);		//located in user_inter.h
+  strcat(msg, HELP2);		//located in user_inter.h
+  strcat(msg, HELP3);		//located in user_inter.h
+  strcat(msg, HELP4);		//located in user_inter.h
+  strcat(msg, HELP5);		//located in user_inter.h
+  strcat(msg, HELP6);		//located in user_inter.h
+  strcat(msg, HELP7);		//located in user_inter.h
+  strcat(msg, HELP8);		//located in user_inter.h
+  strcat(msg, HELP9);		//located in user_inter.h
+  strcat(msg, HELP10);		//located in user_inter.h
+  strcat(msg, HELP11);		//located in user_inter.h
+ strcat(msg, "\0");
+  helpWindow(mylist, msg, "HELP");
+  refresh_screen(0);
+  return ok;
 }
 
 /* --------------------------------------*/
