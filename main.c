@@ -802,7 +802,7 @@ int fileInfoDialog() {
     strcat(tempMsg, linesStr);
     strcat(tempMsg, " lines.\n[");
     for (i=0;i<60;i++){
-        if (i!=30) pathtxt[i] = openFileData.fullPath[i];
+        if (i!=30) pathtxt[i] = currentFile[i];
         else pathtxt[31] = '\n';
     }
     pathtxt[59] = CHAR_NIL;
