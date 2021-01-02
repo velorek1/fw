@@ -19,7 +19,7 @@ Last modified : 28/12/2020 - FIRST COMMIT
 #define MAX_TEXT1 150
 #define MAX_TEXT2 255
 #define TITLE_LENGTH 26
-
+#define VERTICAL_SHIFT 500
 //FUNCTION PROTOTYPES
 void main_screen();
 void cleanArea(int raw);
@@ -61,6 +61,8 @@ int status = 0;
 //FILE SCROLL POINTERS
 long linesinFile =0;
 int  displayLength = 0;
+int  vdisplayLength=0;
+int  currentColumn = 0;
 long scrollLimit = 0;
 long currentLine = 0;
 int scrollActive = 0;
@@ -129,6 +131,7 @@ int keypressed=0;
      ch = readch();
      if (special_keys(ch) == -1) status = -1;
      if (ch == K_CTRL_C) status = -1;
+     if (ch == 'a') {write_num(10,11,vdisplayLength,3,B_GREEN,F_WHITE); write_num(10,10,currentColumn,3,B_RED,F_WHITE); update_screen();}
      if (ch == K_CTRL_L) {
 	filetoDisplay(filePtr, currentLine, 1);
        if(horizontal_menu() == K_ESCAPE) {
@@ -226,11 +229,12 @@ int refresh_screen() {
 /* Query terminal dimensions again and check if resize 
    has been produced */
    get_terminal_dimensions(&scH, &scW);
-   if (scW >79 && scH > 23) displayLogo = 1;
-   else displayLogo = 0; 
-   displayLength = scH - 5;
-   if (filePtr != NULL && scrollActive == 1) scrollLimit = checkScrollValues();      //Update scroll values
-  if(scH != old_scH || scW != old_scW){
+     if (scW >79 && scH > 23) displayLogo = 1;
+     else displayLogo = 0; 
+     displayLength = scH - 5;
+     vdisplayLength = scW;
+     if (filePtr != NULL && scrollActive == 1) scrollLimit = checkScrollValues();      //Update scroll values
+    if(scH != old_scH || scW != old_scW){
         free_buffer();		//delete structure from memory for resize
         create_screen();		//create new structure 
         main_screen();		//Refresh screen in case of resize
@@ -241,7 +245,7 @@ int refresh_screen() {
         old_scH = scH;
         old_scW = scW;
 	return 1;
-  } 
+    } 
   return 0;
 }
 void update_indicators(){
@@ -301,14 +305,21 @@ int special_keys(char ch) {
     } else if(strcmp(chartrail, K_F1_TRAIL) == 0 ||
 	      strcmp(chartrail, K_F1_TRAIL2) == 0) {
       help_info(); 
-      // ARROW KEYS   
+      // ARROW KEYS
+    } else if(strcmp(chartrail, K_LEFT_TRAIL) == 0) {
+      //Left-arrow key
+       if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
+    } else if(strcmp(chartrail, K_RIGHT_TRAIL) == 0) {
+      //Right-arrow key
+       if(currentColumn < VERTICAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
     } else if(strcmp(chartrail, K_UP_TRAIL) == 0) {
       //Up-arrow key
-       if(currentLine >0) {currentLine--; scroll(filePtr);}
+       if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
     } else if(strcmp(chartrail, K_DOWN_TRAIL) == 0) {
       //Down-arrow key 
  	if (scrollActive == 1){
 	   if (currentLine<scrollLimit) currentLine++; 
+	   if (currentColumn > 1) cleanArea(1);
 	   scroll(filePtr);
 	}
      } else if(strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0) {
@@ -395,6 +406,7 @@ void filetoDisplay(FILE *filePtr, long position,int scupdate){
   long     lineCounter = 0, i=1, whereinfile=0;
   double progress=0;
   int k=0;
+  int wherex = 0;
   char    ch;
   time_t  mytime = time(NULL);
   char   *time_str = ctime(&mytime);
@@ -406,14 +418,15 @@ if (filePtr != NULL) {
     whereinfile=gotoLine(filePtr,currentLine);
     if (whereinfile>1) fseek(filePtr, whereinfile, 0);
     while (!feof(filePtr)) {
-	  ch = getc(filePtr);
+	  ch = getc(filePtr);	
+	  wherex = abs(i-currentColumn);
           if (ch != END_LINE_CHAR && ch != '\0') {
-		if (ch==9 || ch==13){
-			 write_ch(i,lineCounter+4,'>',BH_GREEN,F_WHITE);
+		if (ch==9 || ch==13){//with vertical scroll
+			 if (i> currentColumn) write_ch(wherex,lineCounter+4,'>',BH_GREEN,F_WHITE);
 			 i++;
 		}
  		else{
-		 if (i<scW-1) write_ch(i,lineCounter+4,ch,BH_BLUE,F_WHITE);
+		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,BH_BLUE,F_WHITE);
 		  i++;
 		}
 	  }
@@ -427,11 +440,12 @@ if (filePtr != NULL) {
 	  if (lineCounter > scH-6) break;
     }
   //display metrics
-  write_str(1,scH-1,"- Lines:         | - Progress:    %", B_BLACK, F_WHITE); 
+  write_str(1,scH-1,"- Lines:         | - Progress:    %  | - H.Scroll:    /500", B_BLACK, F_WHITE); 
   progress = ((double) currentLine / (double) scrollLimit) * 100;
   write_num(10,scH-1,linesinFile,10, B_BLACK, F_YELLOW); 
   if (scrollActive ==1) write_num(32,scH-1,(int)progress,3, B_BLACK, F_YELLOW); 
   else  write_num(32,scH-1,100,3, B_BLACK, F_YELLOW);  
+  write_num(52,scH-1,currentColumn,3, B_BLACK, F_YELLOW); 
   //display system time
   time_str[strlen(time_str) - 1] = '\0';
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
@@ -447,6 +461,7 @@ void scroll(FILE *filePtr){
   double    progress;
   char    ch;
   int k;
+  int wherex = 0;
 if (filePtr != NULL) {
     //RAW output for smoother scroll
     rewind(filePtr);		//Make sure we are at the beginning
@@ -456,19 +471,22 @@ if (filePtr != NULL) {
       while (!feof(filePtr)) {
 	  ch = getc(filePtr);
 	  outputcolor(F_WHITE,BH_BLUE);
-          gotoxy(i,lineCounter+4);
+	  wherex = abs(i-currentColumn); 
+          if (wherex < scW-1) gotoxy(abs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9 || ch==13){
 	  		outputcolor(F_WHITE,BH_GREEN);
-			printf(">");
+			if (i> currentColumn) printf(">");
 			i++;
 		  } else{
-		    if (i<scW-1) printf("%c",ch);
-          	    i++;
+		    //with vertical scroll
+			if (i> currentColumn) {
+				printf("%c",ch);}
+		i++;
 		} 
 	  }
 	  if(ch == END_LINE_CHAR) { 
-	    for (k=i; k<=scW; k++){	
+	   for (k=i; k<=scW; k++){	
     		outputcolor(F_BLUE,BH_BLUE);
 		gotoxy(k,lineCounter+4);
 		printf("%c",32);
@@ -481,18 +499,23 @@ if (filePtr != NULL) {
   //metrics
   gotoxy(1,scH-1);
   outputcolor(F_WHITE,B_BLACK);
-  printf("- Lines:         | - Progress:    %c",37);
+  printf("- Lines:         | - Progress:    %c  | - H.Scroll:    /500",37);
   progress = ((double) currentLine / (double) scrollLimit) * 100;
   gotoxy(10,scH-1);
   outputcolor(F_YELLOW,B_BLACK);
   printf("%ld", linesinFile); 
   gotoxy(32,scH-1);
-  outputcolor(F_YELLOW,B_BLACK);
+  outputcolor(F_YELLOW,B_BLACK); 
   if (scrollActive == 1) printf("%d", (int)progress);
   else printf("100"); 
+  gotoxy(52,scH-1);
+  outputcolor(F_YELLOW,B_BLACK);
+  printf("%d", currentColumn); 
+ 
 //  write_num(26,scH-1,progress,3, B_BLACK, F_YELLOW); 
 } 
 }
+
 
 void cleanArea(int raw){
 int i,j;
@@ -755,7 +778,7 @@ int fileInfoDialog() {
     strcat(tempMsg, linesStr);
     strcat(tempMsg, " lines.\n[");
     for (i=0;i<60;i++){
-        if (i!=31) pathtxt[i] = openFileData.fullPath[i];
+        if (i!=30) pathtxt[i] = openFileData.fullPath[i];
         else pathtxt[31] = '\n';
     }
     pathtxt[59] = CHAR_NIL;
