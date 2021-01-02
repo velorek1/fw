@@ -758,7 +758,7 @@ int fileInfoDialog() {
         if (i!=31) pathtxt[i] = openFileData.fullPath[i];
         else pathtxt[31] = '\n';
     }
-    pathtxt[60] = CHAR_NIL;
+    pathtxt[59] = CHAR_NIL;
     strcat(tempMsg, pathtxt);
     strcat(tempMsg, "]");
     alertWindow(mylist, tempMsg, "File Information");
@@ -796,7 +796,7 @@ int help_info() {
   strcat(msg, HELP11);		//located in user_inter.h
  strcat(msg, "\0");
   helpWindow(mylist, msg, "HELP");
-  refresh_screen(0);
+  refresh_screen();
   return ok;
 }
 
