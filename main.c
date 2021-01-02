@@ -462,6 +462,8 @@ if (filePtr != NULL) {
 	  }
 	  if (lineCounter > scH-6) break;
     }
+    //to delete the last 0x0A character on screen
+    write_ch(i-1,lineCounter+4,' ',BH_BLUE,F_BLUE);
   //display metrics
   write_str(1,scH-1,"- Lines:         | - Progress:    %  | - H:    /500", B_BLACK, F_WHITE); 
   progress = ((double) currentLine / (double) scrollLimit) * 100;
@@ -473,7 +475,6 @@ if (filePtr != NULL) {
   time_str[strlen(time_str) - 1] = '\0';
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
   //clean viewing area
-  //cleanArea();
   //write to screen buffer
   if (scupdate==1) update_screen();
 }
@@ -509,6 +510,7 @@ if (filePtr != NULL) {
 		} 
 	  }
 	  if(ch == END_LINE_CHAR) { 
+	   printf("%c",32);
 	   for (k=i; k<=scW; k++){	
     		outputcolor(F_BLUE,BH_BLUE);
 		gotoxy(k,lineCounter+4);
@@ -535,7 +537,6 @@ if (filePtr != NULL) {
   outputcolor(F_YELLOW,B_BLACK);
   printf("%d", currentColumn); 
  
-//  write_num(26,scH-1,progress,3, B_BLACK, F_YELLOW); 
 } 
 }
 
