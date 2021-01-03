@@ -3,7 +3,7 @@
 PROGRAM FW File Viewer - A file viewing tool.
 @author : Velorek
 @version : 0.1
-Last modified : 28/12/2020 - FIRST COMMIT 
+Last modified : 03/01/2021 - Horizontal scroll added
 ======================================================================*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +19,8 @@ Last modified : 28/12/2020 - FIRST COMMIT
 #define MAX_TEXT1 150
 #define MAX_TEXT2 255
 #define TITLE_LENGTH 26
-#define VERTICAL_SHIFT 500
+#define HORIZONTAL_SHIFT 500 //maximum horizontal scroll
+
 //FUNCTION PROTOTYPES
 void main_screen();
 void cleanArea(int raw);
@@ -40,10 +41,11 @@ void about_info();
 void setfile();
 int help_info();
 void update_indicators();
+
 /* -----------------------------------*/
 //GLOBAL VARIABLES
 int scW, scH, old_scW, old_scH; //screen dimensions
-char currentFile[MAX_TEXT1];
+char currentPath[MAX_TEXT1];
 char fwfileName[MAX_TEXT2];
 char msg[TITLE_LENGTH] = "=-[fw]:FILE VIEWER v0.1-=\0";
 char    kglobal = 0;		// Global variable for menu animation
@@ -60,12 +62,12 @@ int status = 0;
 
 //FILE SCROLL POINTERS
 long linesinFile =0;
-int  displayLength = 0;
-int  vdisplayLength=0;
-int  currentColumn = 0;
-long scrollLimit = 0;
-long currentLine = 0;
-int scrollActive = 0;
+int  hdisplayLength=0; //horizontal scroll
+int  currentColumn = 0; //horizontal scroll
+int  displayLength = 0; //vertical scroll
+long scrollLimit = 0; //vertical scroll
+long currentLine = 0; //verticall scroll
+int scrollActive = 0; //vertical scroll
 /* -----------------------------------*/
 
 
@@ -87,8 +89,8 @@ int keypressed=0;
   mytimer2.ticks = 0; // Timer 2 - Time animation
   mytimer3.ms = 100;
   mytimer3.ticks = 0; // Timer 3 - Screen display control
-  pushTerm();
-  create_screen();
+  pushTerm();  //record previous terminal settings
+  create_screen(); 
   get_terminal_dimensions(&scH, &scW);
   if (scW >79 && scH > 23) displayLogo = 1;
   else displayLogo = 0; 
@@ -96,7 +98,6 @@ int keypressed=0;
   old_scH = scH;
   old_scW = scW;
   main_screen();
-  save_buffer();
   hidecursor();
   /*-------------------------------------------------------------------*/
   /*------------------------CHECK ARGUMENTS----------------------------*/
@@ -138,7 +139,7 @@ int keypressed=0;
     } 
     if (ch =='d') {
       //Right-arrow key
-       if(currentColumn < VERTICAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
+       if(currentColumn < HORIZONTAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
     }
     if (ch =='w') {
       //Up-arrow key
@@ -166,7 +167,7 @@ int keypressed=0;
      } else{
      
      if (filePtr != NULL && update == 1 && time_since_keypressed>1) {
-	//Screen buffer is updated here!
+	//Screen buffer is updated here! Screenshot of what is shown on screen
 	filetoDisplay(filePtr, currentLine, 1); 
 	update = 0;
 	time_since_keypressed = 0;
@@ -255,7 +256,7 @@ int refresh_screen() {
      if (scW >79 && scH > 23) displayLogo = 1;
      else displayLogo = 0; 
      displayLength = scH - 5;
-     vdisplayLength = scW;
+     hdisplayLength = scW;
      if (filePtr != NULL && scrollActive == 1) scrollLimit = checkScrollValues();      //Update scroll values
     if(scH != old_scH || scW != old_scW){
         free_buffer();		//delete structure from memory for resize
@@ -271,6 +272,7 @@ int refresh_screen() {
     } 
   return 0;
 }
+
 void update_indicators(){
 int i; 
  for (i=1;i<scW; i++){
@@ -281,18 +283,19 @@ int i;
   write_ch(scW,3,' ',B_BLACK,F_BLACK);
 
   write_ch(12,2,NVER_LINE, B_WHITE,F_BLACK);
-  if (strcmp(currentFile,"\0") == 0) {
+  if (strcmp(currentPath,"\0") == 0) {
   	write_str(1,3,"No file open!",B_BLACK,F_WHITE);
     } else
     {
 	write_str(14,2,fwfileName,B_WHITE,F_BLACK);
-	write_str(1,3,currentFile,B_BLACK,F_WHITE);
+	write_str(1,3,currentPath,B_BLACK,F_WHITE);
    }
   write_str(1, 2, "File  Help", B_WHITE, F_BLACK);
   write_str(1, 2, "F", B_WHITE, F_BLUE);
   write_str(7, 2, "H", B_WHITE, F_BLUE);
   update_screen();
 }
+
 /*-----------------------------------------*/
 /* Manage keys that send a ESC sequence    */
 /*-----------------------------------------*/
@@ -300,14 +303,15 @@ int i;
 int special_keys(char ch) {
 /* MANAGE SPECIAL KEYS */
 /* 
-   New implementation: Trail of chars found in keyboard.c
+   New implementation: Trail of chars found in keyb.c
    If K_ESCAPE is captured read a trail up to 5 characters from the console.
    This is to control the fact that some keys may change
    according to the terminal and expand the editor's possibilities.
    Eg: F2 can be either 27 79 81 or 27 91 91 82.  
+   - Note : if (currentColumn > 1) cleanArea(1);	
+	When horizontal scroll is active all the screen is cleaned when moving.
 */
 
-  //int     esc_key = 0;
   char    chartrail[5];
   if(ch == K_ESCAPE) {
     read_keytrail(chartrail);	//Read trail after ESC key
@@ -334,7 +338,7 @@ int special_keys(char ch) {
        if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
     } else if(strcmp(chartrail, K_RIGHT_TRAIL) == 0) {
       //Right-arrow key
-       if(currentColumn < VERTICAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
+       if(currentColumn < HORIZONTAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
     } else if(strcmp(chartrail, K_UP_TRAIL) == 0) {
       //Up-arrow key
        if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
@@ -348,18 +352,22 @@ int special_keys(char ch) {
      } else if(strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0) {
       if (currentLine + displayLength < scrollLimit) currentLine = currentLine + displayLength;
       else currentLine = scrollLimit;
+	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
      } else if(strcmp(chartrail, K_PAGEUP_TRAIL) == 0) {
        if (currentLine - displayLength > 1) currentLine = currentLine - displayLength;
  	else currentLine = 0;
+	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
      } else if(strcmp(chartrail, K_HOME_TRAIL) == 0 ||
 	      strcmp(chartrail, K_HOME_TRAIL2) == 0) {
 	currentLine = 0;
+	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
      } else if(strcmp(chartrail, K_END_TRAIL) == 0 ||
 	      strcmp(chartrail, K_END_TRAIL2) == 0) {
 	currentLine = scrollLimit;
+	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
      } else if(strcmp(chartrail, K_ALT_F) == 0) {
       data.index=FILE_MENU;
@@ -382,10 +390,10 @@ int special_keys(char ch) {
       filetoDisplay(filePtr, currentLine,1);
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
-        strcpy(currentFile, "\0");
-        cleanString(currentFile, MAX_TEXT1);
+        strcpy(currentPath, "\0");
+        cleanString(currentPath, MAX_TEXT1);
         cleanString(fwfileName, MAX_TEXT2);
-        strcpy(currentFile, openFileData.fullPath);
+        strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
         handleopenFile(&filePtr, fwfileName);
 	update_indicators(); 
@@ -394,6 +402,7 @@ int special_keys(char ch) {
   }
  return 0;
 }
+
 /* --------------------------------------*/
 //FILE OPERATIONS
 /* --------------------------------------*/
@@ -425,6 +434,8 @@ int handleopenFile(FILE ** filePtr, char *fwfileName) {
 return 0;
 }
 
+//this routine copies file content to screen buffer so that windows and dialogs
+//can be displayed and the content they cover can be later retrieved
 void filetoDisplay(FILE *filePtr, long position,int scupdate){
   long     lineCounter = 0, i=1, whereinfile=0;
   double progress=0;
@@ -480,6 +491,7 @@ if (filePtr != NULL) {
 }
 }
 
+//this routine does a scroll through file and output directly to screen
 void scroll(FILE *filePtr){
   long    lineCounter = 0, i=1, whereinfile=0;
   double    progress;
@@ -540,7 +552,7 @@ if (filePtr != NULL) {
 } 
 }
 
-
+//clean viewing area
 void cleanArea(int raw){
 int i,j;
    if (raw == 1) {
@@ -565,48 +577,48 @@ void check_arguments(int argc, char *argv[]){
     //Does the file exist? Open or create?
     if(file_exists(argv[1]) == 1) {
       //open file in arguments
-      clearString(currentFile, MAX_TEXT);
+      clearString(currentPath, MAX_TEXT);
       strcpy(fwfileName, argv[1]);
-      getcwd(currentFile, sizeof(currentFile));	//Get path
-      strcat(currentFile, "/");
-      strcat(currentFile, argv[1]);
+      getcwd(currentPath, sizeof(currentPath));	//Get path
+      strcat(currentPath, "/");
+      strcat(currentPath, argv[1]);
       handleopenFile(&filePtr, fwfileName); 
     } else {	      
       //display open file dialog if file does not exist
-      strcpy(currentFile, "\0");
+      strcpy(currentPath, "\0");
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
-        strcpy(currentFile, openFileData.fullPath);
+        strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
         handleopenFile(&filePtr, fwfileName); 
       } else
       {
 	//no file selected or file does not exist
-        strcpy(currentFile, "No file open!");
+        strcpy(currentPath, "No file open!");
         strcpy(fwfileName, "No file open!");
       }
      }
     } else{
 	//display open file dialog if no arguments are given
-      strcpy(currentFile, "\0");
+      strcpy(currentPath, "\0");
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
-        strcpy(currentFile, openFileData.fullPath);
+        strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
         handleopenFile(&filePtr, fwfileName); 
       } else
       {
 	//no file selected or file does not exist
-        strcpy(currentFile, "No file open!");
+        strcpy(currentPath, "No file open!");
         strcpy(fwfileName, "No file open!");
       }
     }
-   if (strcmp(currentFile,"\0") == 0) {
+   if (strcmp(currentPath,"\0") == 0) {
   	write_str(1,3,"No file open!",B_BLACK,F_WHITE);
     } else
     {
 	write_str(14,2,fwfileName,B_WHITE,F_BLACK);
-	write_str(1,3,currentFile,B_BLACK,F_WHITE);
+	write_str(1,3,currentPath,B_BLACK,F_WHITE);
    }
   update_screen();
 }
@@ -627,15 +639,12 @@ long checkScrollValues(){
 char horizontal_menu() {
   char    temp_char;
   kglobal=-1;
-  //cleanStatusBar();
-  //write_str(1, rows, STATUS_BAR_MSG3, STATUSBAR, STATUSMSG);
   loadmenus(mylist, HOR_MENU);
   temp_char = start_hmenu(&data);
   free_list(mylist);
   write_str(1, 2, "File  Help", B_WHITE, F_BLACK);
   write_str(1, 2, "F", B_WHITE, F_BLUE);
   write_str(7, 2, "H", B_WHITE, F_BLUE);
-  //write_str(1, rows, STATUS_BAR_MSG2, STATUSBAR, STATUSMSG);
   update_screen();
   return temp_char;
 }
@@ -645,10 +654,8 @@ char horizontal_menu() {
 /*-------------------------*/
 
 void filemenu() {  
-  //cleanStatusBar();
   int i=0;
   data.index = OPTION_NIL;
-  //write_str(1, rows, STATUS_BAR_MSG2, STATUSBAR, STATUSMSG);
   loadmenus(mylist, FILE_MENU);
   write_str(1, 2, "File", MENU_SELECTOR, MENU_FOREGROUND1);
   draw_window(1, 3, 13, 9, MENU_PANEL, MENU_FOREGROUND0,0, 1,0);
@@ -668,10 +675,10 @@ void filemenu() {
     //External Module - Open file dialog.
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
-        strcpy(currentFile, "\0");
-        cleanString(currentFile, MAX_TEXT1);
+        strcpy(currentPath, "\0");
+        cleanString(currentPath, MAX_TEXT1);
         cleanString(fwfileName, MAX_TEXT2);
-        strcpy(currentFile, openFileData.fullPath);
+        strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
         handleopenFile(&filePtr, fwfileName);
 	update_indicators(); 
@@ -684,22 +691,20 @@ void filemenu() {
 	status = -1;
   }
   data.index = OPTION_NIL;
-  //cleanStatusBar();
-   //Restore message in status bar
-   //write_str(1, rows, STATUS_BAR_MSG1, STATUSBAR, STATUSMSG);
 }
+
 void setfile(){
 int count=0;
  char tempFile[MAX_TEXT];
    count = inputWindow("New File:", tempFile, "Set file name");
     if(count > 0) {
-    //cleanString(currentFile, MAX_TEXT1);
+     cleanString(currentPath, MAX_TEXT1);
      cleanString(fwfileName, MAX_TEXT2);
      strcpy(fwfileName, tempFile);
      handleopenFile(&filePtr, fwfileName);
-     getcwd(currentFile, sizeof(currentFile));	//Get path
-     strcat(currentFile, "/");
-     strcat(currentFile, fwfileName);
+     getcwd(currentPath, sizeof(currentPath));	//Get path
+     strcat(currentPath, "/");
+     strcat(currentPath, fwfileName);
      update_indicators();
     }
 }
@@ -709,9 +714,7 @@ int count=0;
 
 void helpmenu() { 
 
-  //cleanStatusBar();
   data.index = OPTION_NIL;
-  //write_str(1, rows, STATUS_BAR_MSG2, STATUSBAR, STATUSMSG);
   loadmenus(mylist, HELP_MENU);
   write_str(7, 2, "Help", MENU_SELECTOR, MENU_FOREGROUND1);
   draw_window(7, 3, 16, 6, MENU_PANEL, MENU_FOREGROUND0, 0,1,0);
@@ -731,10 +734,8 @@ void helpmenu() {
     about_info();
   }
   data.index = -1;
-  //Restore message in status bar
-  //cleanStatusBar();
-  //write_str(1, rows, STATUS_BAR_MSG1, STATUSBAR, STATUSMSG);
 }
+
 /*----------------------*/
 /* Drop_Down Menu Loop  */
 /*----------------------*/
@@ -785,8 +786,6 @@ int fileInfoDialog() {
   char    tempMsg[150];
   char    pathtxt[60];
   if(filePtr != NULL) {
-    //closeFile(filePtr);
-    //openFile(&filePtr, currentFile, "r");
     size = getfileSize(filePtr);
     lines = countLinesFile(filePtr);
     if(size <= 0)
@@ -802,7 +801,7 @@ int fileInfoDialog() {
     strcat(tempMsg, linesStr);
     strcat(tempMsg, " lines.\n[");
     for (i=0;i<60;i++){
-        if (i!=30) pathtxt[i] = currentFile[i];
+        if (i!=30) pathtxt[i] = currentPath[i];
         else pathtxt[31] = '\n';
     }
     pathtxt[59] = CHAR_NIL;
@@ -822,7 +821,6 @@ void about_info(){
   strcat(msg, ALINE2);
   strcat(msg, ALINE3);
   strcat(msg, ALINE4);
-  //strcat(msg, "\0");
   alertWindow(mylist, msg,"ABOUT");
 
 }
@@ -841,7 +839,7 @@ int help_info() {
   strcat(msg, HELP9);		//located in user_inter.h
   strcat(msg, HELP10);		//located in user_inter.h
   strcat(msg, HELP11);		//located in user_inter.h
- strcat(msg, "\0");
+  strcat(msg, "\0");
   helpWindow(mylist, msg, "HELP");
   refresh_screen();
   return ok;
@@ -888,7 +886,7 @@ char cmsg[31] = "\nFile vieWer. Coded by v3l0r3k\n";
 
  i=0;
  j=0;
- //printf("\n");
+ 
  do{
   if (timerC(&mytimer1) == 1) { 
      if (mytimer1.ticks<23){
