@@ -455,9 +455,13 @@ if (filePtr != NULL) {
 	  ch = getc(filePtr);	
 	  wherex = labs(i-currentColumn);
           if (ch != END_LINE_CHAR && ch != '\0') {
-		if (ch==9 || ch==13){//with vertical scroll
+		if (ch==9){ //for convenience TAB char is shown in green
+			 //with horizontal scroll
 			 if (i> currentColumn) write_ch(wherex,lineCounter+4,'>',BH_GREEN,F_WHITE);
 			 i++;
+		} else if (ch==13){
+		//windows 0x0d is transform to 0x20 
+		  ch=32;
 		}
  		else{
 		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,BH_BLUE,F_WHITE);
@@ -465,12 +469,14 @@ if (filePtr != NULL) {
 		}
 	  }
 	  if(ch == END_LINE_CHAR) { 
+		//next line
 	    for (k=i; k<scW; k++){
 		write_ch(k,lineCounter+4,' ',BH_BLUE,F_BLUE);
 		}
 	    lineCounter++;
 	    i=1;
 	  }
+	//break when it reaches end of vertical displaying area
 	  if (lineCounter > scH-6) break;
     }
     //to delete the last 0x0A character on screen
@@ -510,18 +516,23 @@ if (filePtr != NULL) {
 	  wherex = labs(i-currentColumn); 
           if (wherex < scW-1) gotoxy(labs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
-		if (ch==9 || ch==13){
+		if (ch==9){
+			//for convenience TAB char is shown in green
 	  		outputcolor(F_WHITE,BH_GREEN);
 			if (i> currentColumn) printf(">");
 			i++;
-		  } else{
-		    //with vertical scroll
+		} else if (ch==13){
+		  //windows 0x0d0a transformed to 0x20 
+		   ch = 32;
+		} else{
+		    //currenColumn is for horizontal scroll
 			if (i> currentColumn) {
 				printf("%c",ch);}
 		i++;
 		} 
 	  }
 	  if(ch == END_LINE_CHAR) { 
+	   //next line
 	   printf("%c",32);
 	   for (k=i; k<=scW; k++){	
     		outputcolor(F_BLUE,BH_BLUE);
@@ -531,6 +542,7 @@ if (filePtr != NULL) {
 	    lineCounter++;
 	    i=1;
 	  }
+	//break when it reaches the end of vertical displaying area
 	  if (lineCounter > scH-6) break;
     }
   //metrics
