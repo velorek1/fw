@@ -1,11 +1,13 @@
 # fw - FilevieWer
 
 TUI fileViewer in C for Unix Systems - no dependencies
+MIT licence
 
 TO BUILD AND RUN:
 
     * Download or clone repository.
-    * Type "bash build.sh" and "./fw" to execute.
+    * Type "make" and "./fw" to run.
+    * Alternatively, compile with "bash build.sh".
     
 FEATURES:
 - Millisecond timer for animations.
