@@ -814,7 +814,7 @@ int fileInfoDialog() {
     strcat(tempMsg, " lines.\n[");
     for (i=0;i<60;i++){
         if (i!=30) pathtxt[i] = currentPath[i];
-        else pathtxt[31] = '\n';
+        else pathtxt[30] = '\n';
     }
     pathtxt[59] = CHAR_NIL;
     strcat(tempMsg, pathtxt);
