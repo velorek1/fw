@@ -1,6 +1,6 @@
 .POSIX:
 CC      = cc
-CFLAGS  = -Wall -fsigned-char
+CFLAGS  = -Wall -Wextra -fsigned-char -Os
 LDFLAGS =
 LDLIBS  =
 

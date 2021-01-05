@@ -76,13 +76,14 @@ int kbhit() {
 /*----------------------*/
 int readch() {
   char    ch;
-
+  int ok;
   if(peek_character != -1) {
     ch = peek_character;
     peek_character = -1;
     return ch;
   }
-  read(0, &ch, 1);
+  ok=read(0, &ch, 1);
+  ok++; //to avoid warning signal
   return ch;
 }
 

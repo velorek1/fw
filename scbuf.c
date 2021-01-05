@@ -401,7 +401,7 @@ void write_ch(int x, int y, char ch, int backcolor, int forecolor) {
 void write_str(int x, int y, char *str, int backcolor, int forecolor) {
   //Writes a string of characters to buffer.
   char   *astr;
-  int     i, wherex;
+  unsigned int     i, wherex;
   wherex = x;
   //astr = (char *)malloc(sizeof(char) * strlen(str) + 1);
   astr = str;
@@ -437,7 +437,7 @@ int write_num(int x, int y, int num, int length, int backcolor,
 void update_ch(int x, int y, char ch, char specialChar, int backcolor, int forecolor) {
 //It could be interepreted as write_ch - forced update to screen
 //to be used to simplify code in update_smart.
-char tempchar=0;     
+signed char tempchar=0;     
    gotoxy(x, y);
    outputcolor(forecolor, backcolor);
    if(ch > 0)
@@ -456,7 +456,7 @@ char tempchar=0;
 	tempchar = ch * -1;	//Change negative values to positive.
 	printf("%lc", (wint_t) mapChartoU8(tempchar));	//unicode
     }
-    if(ch >= -128 && ch <= -65)
+    if(ch <= -65)
 	//Accents -61/-62 + char
 	printf("%c%c", specialChar, ch);
     }

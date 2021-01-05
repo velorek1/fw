@@ -140,6 +140,7 @@ void free_list(LISTCHOICE *list_identifier)
       in the caller. */
    head = NULL; 
    tail = NULL;
+   *list_identifier = *list_identifier; //to silence warning
 } 
 /*
 void free_list(LISTCHOICE * list_identifier) {
@@ -169,9 +170,10 @@ in init_list.
 until the auxiliary pointer reaches the first item again
 First item is equal to tail->next.
 */
-
+ 
   LISTCHOICE *aux;
   aux = head;
+  *list_identifier = *list_identifier; //to silence warning/new implementation needed  
   do {
     write_str(aux->wherex, aux->wherey, aux->item, aux->backcolor0,
 	      aux->forecolor0);

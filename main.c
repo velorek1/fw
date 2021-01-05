@@ -30,15 +30,15 @@ int refresh_screen();
 int special_keys(char ch);
 int handleopenFile(FILE ** filePtr, char *fwfileName);
 void credits();
-void filetoDisplay(FILE *filePtr, long position, int scupdate);
+void filetoDisplay(FILE *filePtr, int scupdate);
 void scroll(FILE *filePtr);
-void check_arguments(int argc, char *argv[]);
+char* check_arguments(int argc, char *argv[]);
 long checkScrollValues();
 void    drop_down(char *kglobal);
 char horizontal_menu();
 int fileInfoDialog();
 void about_info();
-void setfile();
+char *setfile();
 int help_info();
 void update_indicators();
 
@@ -156,7 +156,7 @@ int keypressed=0;
     
     if (ch == K_CTRL_C) status = -1;
     if (ch == K_CTRL_L) {
-	filetoDisplay(filePtr, currentLine, 1);
+	filetoDisplay(filePtr,  1);
        if(horizontal_menu() == K_ESCAPE) {
  	//Exit horizontal menu with ESC 3x
 	kglobal = K_ESCAPE;
@@ -168,7 +168,7 @@ int keypressed=0;
      
      if (filePtr != NULL && update == 1 && time_since_keypressed>1) {
 	//Screen buffer is updated here! Screenshot of what is shown on screen
-	filetoDisplay(filePtr, currentLine, 1); 
+	filetoDisplay(filePtr, 1); 
 	update = 0;
 	time_since_keypressed = 0;
      } 
@@ -322,7 +322,7 @@ int special_keys(char ch) {
     if(strcmp(chartrail, K_F2_TRAIL) == 0 ||
        strcmp(chartrail, K_F2_TRAIL2) == 0) {
       //update screen
-      filetoDisplay(filePtr, currentLine,0);
+      filetoDisplay(filePtr, 0);
       if(horizontal_menu() == K_ESCAPE) {
 	//Exit horizontal menu with ESC 3x
 	kglobal = K_ESCAPE;
@@ -376,18 +376,18 @@ int special_keys(char ch) {
       data.index=HELP_MENU;
       drop_down(&kglobal);	//animation  
     } else if(strcmp(chartrail, K_ALT_I) == 0) {
-      filetoDisplay(filePtr, currentLine,0);
+      filetoDisplay(filePtr, 0);
       fileInfoDialog();
     } else if(strcmp(chartrail, K_ALT_A) == 0) {
-      filetoDisplay(filePtr, currentLine,0);
+      filetoDisplay(filePtr, 0);
       about_info();
     } else if(strcmp(chartrail, K_ALT_S) == 0) {
-      filetoDisplay(filePtr, currentLine,0);
+      filetoDisplay(filePtr, 0);
       setfile();
     } else if(strcmp(chartrail, K_ALT_X) == 0) {
       return -1;
     } else if(strcmp(chartrail, K_ALT_O) == 0) {
-      filetoDisplay(filePtr, currentLine,1);
+      filetoDisplay(filePtr, 1);
       openFileDialog(&openFileData);
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
         strcpy(currentPath, "\0");
@@ -436,7 +436,7 @@ return 0;
 
 //this routine copies file content to screen buffer so that windows and dialogs
 //can be displayed and the content they cover can be later retrieved
-void filetoDisplay(FILE *filePtr, long position,int scupdate){
+void filetoDisplay(FILE *filePtr, int scupdate){
   long     lineCounter = 0, i=1, whereinfile=0;
   double progress=0;
   int k=0;
@@ -583,7 +583,8 @@ int i,j;
 }
 }
 
-void check_arguments(int argc, char *argv[]){
+char *check_arguments(int argc, char *argv[]){
+char *ok=NULL;
 //check arguments or display open file dialog
    if(argc > 1) {
     //Does the file exist? Open or create?
@@ -591,7 +592,7 @@ void check_arguments(int argc, char *argv[]){
       //open file in arguments
       clearString(currentPath, MAX_TEXT);
       strcpy(fwfileName, argv[1]);
-      getcwd(currentPath, sizeof(currentPath));	//Get path
+      ok=getcwd(currentPath, sizeof(currentPath));	//Get path
       strcat(currentPath, "/");
       strcat(currentPath, argv[1]);
       handleopenFile(&filePtr, fwfileName); 
@@ -633,6 +634,7 @@ void check_arguments(int argc, char *argv[]){
 	write_str(1,3,currentPath,B_BLACK,F_WHITE);
    }
   update_screen();
+  return ok;
 }
 
 long checkScrollValues(){
@@ -705,7 +707,9 @@ void filemenu() {
   data.index = OPTION_NIL;
 }
 
-void setfile(){
+char *setfile(){
+
+char *ok=NULL;
 int count=0;
  char tempFile[MAX_TEXT];
    count = inputWindow("New File:", tempFile, "Set file name");
@@ -714,11 +718,12 @@ int count=0;
      cleanString(fwfileName, MAX_TEXT2);
      strcpy(fwfileName, tempFile);
      handleopenFile(&filePtr, fwfileName);
-     getcwd(currentPath, sizeof(currentPath));	//Get path
+     ok=getcwd(currentPath, sizeof(currentPath));	//Get path
      strcat(currentPath, "/");
      strcat(currentPath, fwfileName);
      update_indicators();
     }
+   return ok;
 }
 /*--------------------------*/
 /* Display Help menu        */
@@ -793,8 +798,8 @@ void drop_down(char *kglobal) {
 int fileInfoDialog() {
   long    size = 0, lines = 0;
   int     i;
-  char    sizeStr[12];
-  char    linesStr[12];
+  char    sizeStr[20];
+  char    linesStr[20];
   char    tempMsg[150];
   char    pathtxt[60];
   if(filePtr != NULL) {

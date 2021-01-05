@@ -376,7 +376,7 @@ unselecting previous item
 char selectorMenu(LISTBOX * aux, SCROLLDATA * scrollData) {
   char    ch;
   int i;
-  unsigned control = 0;
+  signed control = 0;
   unsigned continueScroll;
   unsigned counter = 0;
   unsigned keypressed = 0;
@@ -694,18 +694,20 @@ int listFiles(LISTBOX ** listBox1, char *directory) {
   return 0;
 }
 
-void changeDir(SCROLLDATA * scrollData, char fullPath[MAX],
+char *changeDir(SCROLLDATA * scrollData, char fullPath[MAX],
 	       char newDir[MAX]) {
 //Change dir
   char    oldPath[MAX];
+  int ok=0;
+  char *ok1=NULL;
   if(scrollData->isDirectory == DIRECTORY) {
     if(scrollData->itemIndex == 1) {
       //cd ..
       cleanString(fullPath, MAX);
       cleanString(oldPath, MAX);
       cleanString(newDir, MAX);
-      chdir("..");
-      getcwd(oldPath, sizeof(oldPath));
+      ok=chdir("..");
+      ok1=getcwd(oldPath, sizeof(oldPath));
       strcpy(newDir, oldPath);
       strcpy(fullPath, oldPath);
     } else {
@@ -713,14 +715,16 @@ void changeDir(SCROLLDATA * scrollData, char fullPath[MAX],
       cleanString(fullPath, MAX);
       cleanString(newDir, MAX);
       cleanString(oldPath, MAX);
-      getcwd(oldPath, sizeof(oldPath));
+      ok1=getcwd(oldPath, sizeof(oldPath));
       strcat(oldPath, "/");
       strcat(oldPath, scrollData->path);
-      chdir(oldPath);
+      ok=chdir(oldPath);
       strcpy(newDir, oldPath);
       strcpy(fullPath, oldPath);
     }
   }
+ok++;
+return ok1;
 }
 int setFileName(char fileName[MAX]) {
   char    tempFile[MAX];
@@ -755,9 +759,10 @@ backcolor1, forecolor1, displayLimit); */
 
 /*========================================================================*/
 
-void openFileDialog(SCROLLDATA * openFileData) {
+char *openFileDialog(SCROLLDATA * openFileData) {
   SCROLLDATA scrollData;
   char    ch;
+  char   *ok1=NULL;
   int     exitFlag = 0;
   int     i,ok;
   int     rows, columns;
@@ -792,7 +797,7 @@ void openFileDialog(SCROLLDATA * openFileData) {
   //Change background color
 
   strcpy(newDir, ".");		//We start at current dir
-  getcwd(fullPath, sizeof(fullPath));	//Get path
+  ok1= getcwd(fullPath, sizeof(fullPath));	//Get path
 
   //Directories loop
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0, WINDOW_TITLEB,1,1);
@@ -866,6 +871,7 @@ void openFileDialog(SCROLLDATA * openFileData) {
     strcpy(openFileData->path, scrollData.path);
   }
   deleteList(&listBox1);
+return ok1;
 }
 
 

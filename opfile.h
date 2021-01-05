@@ -97,10 +97,10 @@ void    displayItem2(LISTBOX * aux, SCROLLDATA * scrollData, int select);
 int     listFiles(LISTBOX ** listBox1, char *directory);
 int     addSpaces(char temp[MAX_ITEM_LENGTH]);
 void    cleanString(char *string, int max);
-void    changeDir(SCROLLDATA * scrollData, char fullPath[MAX],
+char   *changeDir(SCROLLDATA * scrollData, char fullPath[MAX],
 		  char newDir[MAX]);
 //OPEN FILE DIALOG
-void    openFileDialog(SCROLLDATA * openFileData);
+char   *openFileDialog(SCROLLDATA * openFileData);
 int	setFileName(char fileName[MAX]);
 
 #endif
