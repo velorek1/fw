@@ -545,6 +545,10 @@ if (filePtr != NULL) {
 	//break when it reaches the end of vertical displaying area
 	  if (lineCounter > scH-6) break;
     }
+  //delete last 0x0a
+  gotoxy(i-1,lineCounter+4);
+  outputcolor(F_BLUE,BH_BLUE);
+  printf(" ");
   //metrics
   gotoxy(1,scH-1);
   outputcolor(F_WHITE,B_BLACK);
