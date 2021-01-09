@@ -410,6 +410,7 @@ int handleopenFile(FILE ** filePtr, char *fwfileName) {
   long    checkF = 0;
   int     ok = 0;
   currentLine = 0;
+  currentColumn=0;
   scrollLimit = 0;
   openFile(filePtr, fwfileName, "r");
   //Check for binary characters to determine filetype
