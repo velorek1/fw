@@ -97,6 +97,7 @@ int keypressed=0;
   displayLength = scH - 5;
   old_scH = scH;
   old_scW = scW;
+  resetch();
   main_screen();
   hidecursor();
   /*-------------------------------------------------------------------*/
@@ -173,6 +174,7 @@ int keypressed=0;
 	time_since_keypressed = 0;
      } 
      ch = 0;
+     keypressed = 0;
    }
   } while (status != -1);
   /*--------------------------------------------------------------------*/
