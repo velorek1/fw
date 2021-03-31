@@ -409,31 +409,21 @@ int special_keys(char ch) {
 //FILE OPERATIONS
 /* --------------------------------------*/
 int handleopenFile(FILE ** filePtr, char *fwfileName) {
-  long    checkF = 0;
-  int     ok = 0;
+  //long    checkF = 0;
+  //int     ok = 0;
   currentLine = 0;
   currentColumn=0;
   scrollLimit = 0;
   openFile(filePtr, fwfileName, "r");
   //Check for binary characters to determine filetype
-  checkF = checkFile(*filePtr);
+  //checkF = checkFile(*filePtr);
   linesinFile = countLinesFile(*filePtr);
   
   if (linesinFile > displayLength) scrollActive = 1;
     else scrollActive = 0;
-  if(checkF > 5) {
-    //File doesn't seem to be a text file. Open anyway?  
-    ok = yesnoWindow(mylist, "File is not a text file! \nOpen anyway?", "Info");
-    if(ok == 1) {
- 	update=1;
-    } else
-    {
-     credits();
-    } 
-  } else {
+
     update=1;
-    return ok;
-   }
+
 return 0;
 }
 
