@@ -408,11 +408,17 @@ char selectorMenu(LISTBOX * aux, SCROLLDATA * scrollData) {
 
   //It break the loop everytime the boundaries are reached.
   //to reload a new list to show the scroll animation.
+  //clean path
+  gotoxy(1,3);
+  outputcolor(B_BLACK, F_BLACK);
+  for (i=0; i<scWidth; i++)
+  printf(" ");
   while(control != CONTINUE_SCROLL) {
     //display path on Screen
     gotoxy(1, 3);
     outputcolor(B_BLACK, F_WHITE);
     printf("%s", fullPath);
+    //endpath display
     keypressed = kbhit();
    if (keypressed == 1){
       ch = readch();
