@@ -413,13 +413,13 @@ char selectorMenu(LISTBOX * aux, SCROLLDATA * scrollData) {
   outputcolor(B_BLACK, F_BLACK);
   for (i=0; i<scWidth; i++)
   printf(" ");
+  //display path on Screen
+  gotoxy(1, 3);
+  outputcolor(B_BLACK, F_WHITE);
+  printf("%s", fullPath);
+  //endpath display
   while(control != CONTINUE_SCROLL) {
-    //display path on Screen
-    gotoxy(1, 3);
-    outputcolor(B_BLACK, F_WHITE);
-    printf("%s", fullPath);
-    //endpath display
-    keypressed = kbhit();
+   keypressed = kbhit();
    if (keypressed == 1){
       ch = readch();
       keypressed = 0;
