@@ -52,7 +52,7 @@ char    kglobal = 0;		// Global variable for menu animation
 LISTCHOICE *mylist, data; //menus handler
 SCROLLDATA openFileData; //openFile dialog
 LISTCHOICE *mylist, data; //menus handler
-FILE   *filePtr;
+FILE   *filePtr=NULL;
 
 //BOOL-like variables
 int update = 0; //Bool global variable to control when screen is written to buffer
@@ -134,27 +134,28 @@ int keypressed=0;
      //ESC-KEY related keys
      if (special_keys(ch) == -1) status = -1;
     //FAIL-SAFE ARROW KEYS
-    if (ch =='a') {
-      //Left-arrow key
-       if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
-    } 
-    if (ch =='d') {
-      //Right-arrow key
-       if(currentColumn < HORIZONTAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
+   if (filePtr != NULL){
+      if (ch =='a') {
+        //Left-arrow key
+         if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
+      } 
+      if (ch =='d') {
+        //Right-arrow key
+         if(currentColumn < HORIZONTAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
+      }
+      if (ch =='w') {
+        //Up-arrow key
+         if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
+      } 
+      if (ch == 's') {
+        //Down-arrow key 
+ 	  if (scrollActive == 1){
+	     if (currentLine<scrollLimit) currentLine++; 
+	     if (currentColumn > 1) cleanArea(1);
+	     scroll(filePtr);
+   	  }
+       }
     }
-    if (ch =='w') {
-      //Up-arrow key
-       if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
-    } 
-    if (ch == 's') {
-      //Down-arrow key 
- 	if (scrollActive == 1){
-	   if (currentLine<scrollLimit) currentLine++; 
-	   if (currentColumn > 1) cleanArea(1);
-	   scroll(filePtr);
-	}
-     }
-    
     if (ch == K_CTRL_C) status = -1;
     if (ch == K_CTRL_L) {
 	filetoDisplay(filePtr,  1);
@@ -255,7 +256,7 @@ int refresh_screen() {
 /* Query terminal dimensions again and check if resize 
    has been produced */
    get_terminal_dimensions(&scH, &scW);
-     if (scW >79 && scH > 23) displayLogo = 1;
+    if (scW >79 && scH > 23) displayLogo = 1;
      else displayLogo = 0; 
      displayLength = scH - 5;
      hdisplayLength = scW;
@@ -335,39 +336,39 @@ int special_keys(char ch) {
 	      strcmp(chartrail, K_F1_TRAIL2) == 0) {
       help_info(); 
       // ARROW KEYS
-    } else if(strcmp(chartrail, K_LEFT_TRAIL) == 0) {
+    } else if((strcmp(chartrail, K_LEFT_TRAIL) == 0) && filePtr != NULL ) {
       //Left-arrow key
        if(currentColumn > 0) {currentColumn--; cleanArea(1); scroll(filePtr);}  
-    } else if(strcmp(chartrail, K_RIGHT_TRAIL) == 0) {
+    } else if((strcmp(chartrail, K_RIGHT_TRAIL) == 0)  && filePtr != NULL ) {
       //Right-arrow key
        if(currentColumn < HORIZONTAL_SHIFT) {currentColumn++; cleanArea(1); scroll(filePtr);}  
-    } else if(strcmp(chartrail, K_UP_TRAIL) == 0) {
+    } else if((strcmp(chartrail, K_UP_TRAIL) == 0)  && filePtr != NULL ) {
       //Up-arrow key
        if(currentLine >0) {currentLine--; if (currentColumn > 1) cleanArea(1);scroll(filePtr);}
-    } else if(strcmp(chartrail, K_DOWN_TRAIL) == 0) {
+    } else if((strcmp(chartrail, K_DOWN_TRAIL) == 0)  && filePtr != NULL ) {
       //Down-arrow key 
  	if (scrollActive == 1){
 	   if (currentLine<scrollLimit) currentLine++; 
 	   if (currentColumn > 1) cleanArea(1);
 	   scroll(filePtr);
 	}
-     } else if(strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0) {
+     } else if((strcmp(chartrail, K_PAGEDOWN_TRAIL) == 0)  && filePtr != NULL )  {
       if (currentLine + displayLength < scrollLimit) currentLine = currentLine + displayLength;
       else currentLine = scrollLimit;
 	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
-     } else if(strcmp(chartrail, K_PAGEUP_TRAIL) == 0) {
+     } else if((strcmp(chartrail, K_PAGEUP_TRAIL) == 0)  && filePtr != NULL ) {
        if (currentLine - displayLength > 1) currentLine = currentLine - displayLength;
  	else currentLine = 0;
 	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
-     } else if(strcmp(chartrail, K_HOME_TRAIL) == 0 ||
-	      strcmp(chartrail, K_HOME_TRAIL2) == 0) {
+     } else if((strcmp(chartrail, K_HOME_TRAIL) == 0 ||
+	      strcmp(chartrail, K_HOME_TRAIL2) == 0)  && filePtr != NULL ) {
 	currentLine = 0;
 	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
-     } else if(strcmp(chartrail, K_END_TRAIL) == 0 ||
-	      strcmp(chartrail, K_END_TRAIL2) == 0) {
+     } else if((strcmp(chartrail, K_END_TRAIL) == 0 ||
+	      strcmp(chartrail, K_END_TRAIL2) == 0)  && filePtr != NULL ) {
 	currentLine = scrollLimit;
 	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
@@ -714,10 +715,24 @@ int count=0;
      cleanString(currentPath, MAX_TEXT1);
      cleanString(fwfileName, MAX_TEXT2);
      strcpy(fwfileName, tempFile);
-     handleopenFile(&filePtr, fwfileName);
-     ok=getcwd(currentPath, sizeof(currentPath));	//Get path
-     strcat(currentPath, "/");
-     strcat(currentPath, fwfileName);
+     if (file_exists(fwfileName)){
+       handleopenFile(&filePtr, fwfileName);
+       ok=getcwd(currentPath, sizeof(currentPath));	//Get path
+       strcat(currentPath, "/");
+       strcat(currentPath, fwfileName);
+     } else
+     {
+       infoWindow(mylist, "File does not exist!", "File Information");
+       cleanString(currentPath, MAX_TEXT1);
+       cleanString(fwfileName, MAX_TEXT2);
+       currentPath[0] ='\0';
+       fwfileName[0] ='\0';
+       filePtr = NULL;
+       scrollActive = 0;
+       cleanArea(0);
+       displayLogo = 1; 
+       main_screen();
+     }
      update_indicators();
     }
    return ok;
