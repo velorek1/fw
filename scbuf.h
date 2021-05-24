@@ -21,7 +21,7 @@ Last modified : 14/4/2019 Rename headers + screenChanged added
 #include <locale.h>
 #include <wchar.h>		/* wint_t */
 #include "rterm.h"
-//#include "keyb.h"
+#include "keyb.h"
 
 
 #define NHOR_LINE -50
@@ -45,8 +45,8 @@ typedef struct _screencell {
   int     index;		// Item number
   int     backcolor0;		// Back and Fore colors of each cell
   int     forecolor0;
-  int     rows;			//Save screen dimensions
-  int     columns;
+  int     sc_rows;			//Save screen dimensions
+  int     sc_columns;
   char    item;			// Item string
   int     specialchar;		// Control for accents and special chars   
   struct _screencell *next;	// Pointer to next item
