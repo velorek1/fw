@@ -1,11 +1,11 @@
 /*
 ========================================================================
-- HEADER - 
+- HEADER -
 Module to show user interface windows, textbox, etc.
 @author : Velorek
-@version : 1.0  
+@version : 1.0
 Last modified: 30/12/2020 Adapted for FileViewer
-                                                                
+
 ========================================================================
 */
 
@@ -52,14 +52,14 @@ Last modified: 30/12/2020 Adapted for FileViewer
 #define OPTION_3 2
 #define OPTION_4 3
 #define OPTION_5 4
-#define OPTION_NIL -1		//Reset option
+#define OPTION_NIL -1       //Reset option
 #define CONFIRMATION 1
-#define K_LEFTMENU -1		//Left arrow key pressed while in menu
-#define K_RIGHTMENU -2		//Right arrow key pressed while in menu
+#define K_LEFTMENU -1       //Left arrow key pressed while in menu
+#define K_RIGHTMENU -2      //Right arrow key pressed while in menu
 
 //EDIT CONSTANTS
 #define CHAR_NIL '\0'
-#define END_LINE_CHAR 0x0A	// $0A
+#define END_LINE_CHAR 0x0A  // $0A
 #define FILL_CHAR 32
 
 //GLOBAL VARIABLES - COLOR SCHEME
@@ -93,8 +93,8 @@ extern int WINDOW_TITLEF;
 void    loadmenus(LISTCHOICE * mylist, int choice);
 
 int     textbox(int wherex, int wherey, int displayLength,
-		char label[MAX_TEXT], char text[MAX_TEXT], int backcolor,
-		int labelcolor, int textcolor);
+        char label[MAX_TEXT], char text[MAX_TEXT], int backcolor,
+        int labelcolor, int textcolor);
 int     alertWindow(LISTCHOICE * mylist, char *message, char *windowTitle);
 int     infoWindow(LISTCHOICE * mylist, char *message, char *windowTitle);
 int     inputWindow(char *label, char *tempFile, char *windowTitle);

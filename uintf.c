@@ -1,11 +1,11 @@
-/* 
+/*
 ======================================================================
 Module to manage user interface options like menus,
 windows, textbox, etc.
 
 @author : Velorek
 @version : 1.0
- 
+
 LAST MODIFIED : 30/12/2020 - Adapted for FileViewer
 ======================================================================
 */
@@ -26,7 +26,7 @@ LAST MODIFIED : 30/12/2020 - Adapted for FileViewer
 
 #define K_ENTER 13
 #define K_TAB 9
-#define MAX_TEXT 150		//MENU CONSTANTS
+#define MAX_TEXT 150        //MENU CONSTANTS
 #define HOR_MENU -1
 #define FILE_MENU 0
 #define HELP_MENU 1
@@ -41,7 +41,7 @@ LAST MODIFIED : 30/12/2020 - Adapted for FileViewer
 #define OPTION_3 2
 #define OPTION_4 3
 #define OPTION_5 4
-#define OPTION_NIL -1		//Reset option
+#define OPTION_NIL -1       //Reset option
 #define CONFIRMATION 1
 #define CANCEL 2
 
@@ -69,7 +69,7 @@ int SCROLLBAR_BACK= B_WHITE;
 int SCROLLBAR_FORE= F_WHITE;
 int SCROLLBAR_SEL= B_CYAN;
 int SCROLLBAR_ARR= B_BLACK;
-int WINDOW_TITLEB = B_BLACK; 
+int WINDOW_TITLEB = B_BLACK;
 int WINDOW_TITLEF = F_WHITE;
 
 /*====================================================================*/
@@ -119,8 +119,8 @@ void loadmenus(LISTCHOICE * mylist, int choice) {
 /*----------------------------*/
 
 int textbox(int wherex, int wherey, int displayLength,
-	    char label[MAX_TEXT], char text[MAX_TEXT], int backcolor,
-	    int labelcolor, int textcolor) {
+        char label[MAX_TEXT], char text[MAX_TEXT], int backcolor,
+        int labelcolor, int textcolor) {
   int     charCount = 0;
   int     exitFlag = 0;
   int     cursorON = 1;
@@ -142,7 +142,7 @@ int textbox(int wherex, int wherey, int displayLength,
     write_ch(i, wherey, '.', backcolor, textcolor);
   }
   write_ch(positionx + displayLength + 1, wherey, ']', backcolor,
-	   textcolor);
+       textcolor);
   update_screen();
   //Reset keyboard
   if(kbhit() == 1) ch = readch();
@@ -156,8 +156,8 @@ int textbox(int wherex, int wherey, int displayLength,
     if(cursorCount == 10000) {
       cursorCount = 0;
       switch (cursorON) {
-	case 1:
-	  posCursor = positionx + 1;
+    case 1:
+      posCursor = positionx + 1;
           displayChar = '.';
           if (posCursor == limitCursor) {
             posCursor = posCursor - 1;
@@ -166,38 +166,38 @@ int textbox(int wherex, int wherey, int displayLength,
           write_ch(posCursor, wherey, displayChar, backcolor, textcolor);
           update_screen();
           cursorON = 0;
-	  break;
-	case 0:
+      break;
+    case 0:
           posCursor = positionx + 1;
           if (posCursor == limitCursor) posCursor = posCursor - 1;
-	  write_ch(posCursor, wherey, '|', backcolor, textcolor);
+      write_ch(posCursor, wherey, '|', backcolor, textcolor);
           update_screen();
           cursorON = 1;
-	  break;
+      break;
       }
-     } 
+     }
     }
-    //Process keys     
+    //Process keys
     if(keypressed == 1) {
       ch = readch();
       keypressed = 0;
-      
+
       //Read special keys
       if (ch==K_ESCAPE) {
-               read_keytrail(chartrail);    
+               read_keytrail(chartrail);
       }
       //Read accents
       //if (ch==SPECIAL_CHARSET_1) read_accentchar(&ch, accentchar);
       //if (ch==SPECIAL_CHARSET_2) read_accentchar(&ch, accentchar);
 
       if(charCount < displayLength) {
-	if(ch > 31 && ch < 127) {
-	  write_ch(positionx + 1, wherey, ch, backcolor, textcolor);
-	  text[charCount] = ch;
-	  positionx++;
-	  charCount++;
-	  update_screen();
-	}
+    if(ch > 31 && ch < 127) {
+      write_ch(positionx + 1, wherey, ch, backcolor, textcolor);
+      text[charCount] = ch;
+      positionx++;
+      charCount++;
+      update_screen();
+    }
       }
     }
     if (ch==K_BACKSPACE){
@@ -240,21 +240,21 @@ int infoWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   loadmenus(mylist, OK_MENU);
 
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0,
-	      WINDOW_TITLEB,1,1);
+          WINDOW_TITLEB,1,1);
   write_str((window_x2-window_x1) /2 + window_x1 - (strlen(windowTitle)/2) , window_y1-1, windowTitle, WINDOW_TITLEB, WINDOW_TITLEF);
-  //Write message to info window  
+  //Write message to info window
   for(i = 0; i < strlen(message); i++) {
     tempChar = message[i];
     //Maximum four lines
     if(j < 4) {
       //Split message if \n
       if(tempChar == '\n') {
-	j++;
-	ix = 0;
+    j++;
+    ix = 0;
       } else {
-	write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
-		 MENU_PANEL);
-	ix++;
+    write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
+         MENU_PANEL);
+    ix++;
       }
     }
   }
@@ -262,7 +262,7 @@ int infoWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   free_list(mylist);
   close_window();
   if(data.index == OPTION_1)
-    ok = CONFIRMATION;		//Confirmation has been given 
+    ok = CONFIRMATION;      //Confirmation has been given
   return ok;
 }
 
@@ -285,21 +285,21 @@ int alertWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   loadmenus(mylist, OK_MENU2);
 
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0,
-	      WINDOW_TITLEB,1,1);
+          WINDOW_TITLEB,1,1);
   write_str((window_x2-window_x1) /2 + window_x1 - (strlen(windowTitle)/2) , window_y1-1, windowTitle, WINDOW_TITLEB, WINDOW_TITLEF);
-  //Write message to alert window  
+  //Write message to alert window
   for(i = 0; i < strlen(message); i++) {
     tempChar = message[i];
     //Maximum four lines
     if(j < 5) {
       //Split message if \n
       if(tempChar == '\n') {
-	j++;
-	ix = 0;
+    j++;
+    ix = 0;
       } else {
-	write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
-		 MENU_PANEL);
-	ix++;
+    write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
+         MENU_PANEL);
+    ix++;
       }
     }
   }
@@ -307,7 +307,7 @@ int alertWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   free_list(mylist);
   close_window();
   if(data.index == OPTION_1)
-    ok = CONFIRMATION;		//Confirmation has been given 
+    ok = CONFIRMATION;      //Confirmation has been given
   return ok;
 }
 
@@ -330,28 +330,28 @@ int yesnoWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   window_x2 = (columns / 2) + 13;
   loadmenus(mylist, YESNO_MENU);
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0,
-	      WINDOW_TITLEB,1,1);
+          WINDOW_TITLEB,1,1);
   write_str((window_x2-window_x1) /2 + window_x1 - (strlen(windowTitle)/2) , window_y1-1, windowTitle, WINDOW_TITLEB, WINDOW_TITLEF);
-  //Write message to yes/no window  
+  //Write message to yes/no window
   for(i = 0; i < strlen(message); i++) {
     tempChar = message[i];
     //Maximum four lines
     if(j < 4) {
       //Split message if \n
       if(tempChar == '\n') {
-	j++;
-	ix = 0;
+    j++;
+    ix = 0;
       } else {
-	write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
-		 MENU_PANEL);
-	ix++;
+    write_ch(window_x1 + 1 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
+         MENU_PANEL);
+    ix++;
       }
     }
   }
   start_hmenu(&data);
   free_list(mylist);
   if(data.index == OPTION_1)
-    ok = CONFIRMATION;		//Confirmation has been given
+    ok = CONFIRMATION;      //Confirmation has been given
   if(data.index == OPTION_3)
     ok = CANCEL;
   close_window();
@@ -371,11 +371,11 @@ int inputWindow(char *label, char *tempFile, char *windowTitle) {
   window_x2 = (columns / 2) + 14;
 
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0,
-	      WINDOW_TITLEB,1,1);
+          WINDOW_TITLEB,1,1);
   write_str((window_x2-window_x1) /2 + window_x1 - (strlen(windowTitle)/2) , window_y1-1, windowTitle, WINDOW_TITLEB, WINDOW_TITLEF);
   count =
       textbox(window_x1 + 1, window_y1 + 1, 16, label, tempFile, MENU_PANEL,
-	      MENU_FOREGROUND0, MENU_FOREGROUND0);
+          MENU_FOREGROUND0, MENU_FOREGROUND0);
   close_window();
   return count;
 }
@@ -400,19 +400,19 @@ int helpWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   draw_window(window_x1, window_y1, window_x2, window_y2, MENU_PANEL, MENU_FOREGROUND0,WINDOW_TITLEB,1,1);
   write_str((window_x2-window_x1) /2 + window_x1 - (strlen(windowTitle)/2) , window_y1-1, windowTitle, WINDOW_TITLEB, WINDOW_TITLEF);
 
-  //Write message to info window  
+  //Write message to info window
   for(i = 0; i < strlen(message); i++) {
     tempChar = message[i];
     //Maximum four lines
     if(j < window_y2-2) {
       //Split message if \n
       if(tempChar == '\n') {
-	j++;
-	ix = 0;
+    j++;
+    ix = 0;
       } else {
-	write_ch(window_x1 + 2 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
-		 MENU_PANEL);
-	ix++;
+    write_ch(window_x1 + 2 + ix, window_y1 + 1 + j, tempChar, MENU_FOREGROUND0,
+         MENU_PANEL);
+    ix++;
       }
     }
   }
@@ -421,7 +421,7 @@ int helpWindow(LISTCHOICE * mylist, char *message, char *windowTitle) {
   free_list(mylist);
   close_window();
   if(data.index == OPTION_1)
-    ok = CONFIRMATION;		//Confirmation has been given 
+    ok = CONFIRMATION;      //Confirmation has been given
   return ok;
 }
 

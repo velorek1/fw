@@ -1,6 +1,6 @@
-/* 
+/*
 ======================================================================
-HEADER: Module to create a double screen buffer to control how things 
+HEADER: Module to create a double screen buffer to control how things
 are displayed on the terminal.
 
 @author : Velorek
@@ -19,7 +19,7 @@ Last modified : 14/4/2019 Rename headers + screenChanged added
 #include <stdio.h>
 #include <string.h>
 #include <locale.h>
-#include <wchar.h>		/* wint_t */
+#include <wchar.h>      /* wint_t */
 #include "rterm.h"
 #include "keyb.h"
 
@@ -42,39 +42,39 @@ Last modified : 14/4/2019 Rename headers + screenChanged added
 /*====================================================================*/
 
 typedef struct _screencell {
-  int     index;		// Item number
-  int     backcolor0;		// Back and Fore colors of each cell
+  int     index;        // Item number
+  int     backcolor0;       // Back and Fore colors of each cell
   int     forecolor0;
-  int     sc_rows;			//Save screen dimensions
+  int     sc_rows;          //Save screen dimensions
   int     sc_columns;
-  char    item;			// Item string
-  int     specialchar;		// Control for accents and special chars   
-  struct _screencell *next;	// Pointer to next item
+  char    item;         // Item string
+  int     specialchar;      // Control for accents and special chars
+  struct _screencell *next; // Pointer to next item
 } SCREENCELL;
 
 /*====================================================================*/
 /* FUNCTION PROTOTYPES                                                */
 /*====================================================================*/
 
-void    create_screen();
+void    create_screen(void);
 void    write_ch(int x, int y, char ch, int backcolor, int forecolor);
 char    read_char(int x, int y);
 void    write_str(int x, int y, char *str, int backcolor, int forecolor);
 int     write_num(int x, int y, int num, int length, int backcolor,
-		  int forecolor);
-void    save_buffer();
-void    restore_buffer();
+          int forecolor);
+void    save_buffer(void);
+void    restore_buffer(void);
 void    screen_color(int color);
-void    free_buffer();
+void    free_buffer(void);
 void    draw_window(int x1, int y1, int x2, int y2, int backcolor,
-		    int bordercolor, int titlecolor, int border, int title);
-void    close_window();
+int     bordercolor, int titlecolor, int border, int title);
+void    close_window(void);
 int     mapChartoU8(int character);
-void    update_screen();
+void    update_screen(void);
 void    update_ch(int x, int y, char ch, char specialChar, int backcolor, int forecolor);
-int 	screenChanged();
-int     update_smart();
-void    flush_buffer();
+int     screenChanged(void);
+int     update_smart(void);
+void    flush_buffer(void);
 void    flush_cell(int x, int y);
 void    clearString(char *string, int max);
 
