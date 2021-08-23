@@ -123,7 +123,7 @@ int keypressed=0;
     else
       time_since_keypressed = 0;
          //check screen dimensions & update if changed
-         refresh_screen(0);
+         refresh_screen();
        }
    //CHECK KEYS
    keypressed = kbhit();
