@@ -1,11 +1,11 @@
-/* 
+/*
 ======================================================================
 Module to describe basic file operations.
 
 @author : Velorek
 @version : 1.0
- 
-LAST MODIFIED : 14/04/2019 - Rename headers 
+
+LAST MODIFIED : 14/04/2019 - Rename headers
 ======================================================================
 */
 
@@ -26,7 +26,7 @@ LAST MODIFIED : 14/04/2019 - Rename headers
 int file_exists(char *fileName) {
   int     ok;
   if(access(fileName, F_OK) != -1) {
-    ok = 1;			//File exists
+    ok = 1;         //File exists
   } else {
     ok = 0;
   }
@@ -56,12 +56,12 @@ long countLinesFile(FILE * filePtr) {
   char    ch;
   long    counterA = 0;
   if(filePtr != NULL) {
-    rewind(filePtr);		//Make sure we are at the beginning
+    rewind(filePtr);        //Make sure we are at the beginning
 
-    ch = getc(filePtr);		//Peek ahead in the file
+    ch = getc(filePtr);     //Peek ahead in the file
     while(!feof(filePtr)) {
       if(ch == 10) {
-	counterA++;
+    counterA++;
       }
       ch = getc(filePtr);
     }
@@ -73,12 +73,12 @@ long gotoLine(FILE * filePtr, long line) {
   long    counterA = 0;
   long   result=0;
   if(filePtr != NULL) {
-    rewind(filePtr);		//Make sure we are at the beginning
+    rewind(filePtr);        //Make sure we are at the beginning
 
-    ch = getc(filePtr);		//Peek ahead in the file
+    ch = getc(filePtr);     //Peek ahead in the file
     while(!feof(filePtr)) {
       if(ch == 10) {
-	counterA++;
+    counterA++;
       }
       if (line == counterA) break;
       ch = getc(filePtr);
@@ -99,14 +99,14 @@ long checkFile(FILE * filePtr) {
   char    ch;
   long    counterA = 0;
   if(filePtr != NULL) {
-    rewind(filePtr);		//Make sure we are at the beginning
+    rewind(filePtr);        //Make sure we are at the beginning
 
-    ch = getc(filePtr);		//Peek ahead in the file
+    ch = getc(filePtr);     //Peek ahead in the file
     while(!feof(filePtr)) {
       if(ch < 9) {
-	//discard accents
-	if(ch > -60)
-	  counterA++;
+    //discard accents
+    if(ch > -60)
+      counterA++;
       }
       ch = getc(filePtr);
     }
@@ -120,9 +120,9 @@ long checkFile(FILE * filePtr) {
 /*-----------*/
 
 int openFile(FILE ** filePtr, char fileName[], char *mode)
-/* 
+/*
 Open file.
-@return ok = 1 ? 0 Success! 
+@return ok = 1 ? 0 Success!
 */
 {
   int     ok = 0;
@@ -143,9 +143,9 @@ Open file.
 /*------------*/
 
 int closeFile(FILE * filePtr) {
-/* 
+/*
    Close file
-@return ok: 
+@return ok:
 */
   int     ok=0;
 

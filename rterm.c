@@ -1,10 +1,10 @@
-/* 
+/*
 ======================================================================
 Module to control some display routines that implement ANSI functions.
 
 @author : Velorek
 @version : 1.0
- 
+
 LAST MODIFIED : 14/04/2019 Rename Headers
 ======================================================================
 */
@@ -34,7 +34,7 @@ static int peek_character = -1;
 /*-------------------------------------*/
 /* Initialize new terminal i/o settings*/
 /*-------------------------------------*/
-void pushTerm() {
+void pushTerm(void) {
 //Save terminal settings in failsafe to be retrived at the end
   tcgetattr(0, &failsafe);
 }
@@ -42,7 +42,7 @@ void pushTerm() {
 /*---------------------------*/
 /* Reset terminal to failsafe*/
 /*---------------------------*/
-int resetTerm() {
+int resetTerm(void) {
   //tcsetattr(0, TCSANOW, &failsafe);
   /* flush and reset */
   if (tcsetattr(0,TCSAFLUSH,&failsafe) < 0) return -1;
@@ -54,7 +54,7 @@ int resetTerm() {
 /* Detect whether a key has been pressed.*/
 /*---------------------------------------*/
 
-int kbhit()
+int kbhit(void)
 {
     if(peek_character != -1)
     return 1;
@@ -74,7 +74,7 @@ int kbhit()
 /*----------------------*/
 /*Read char with control*/
 /*----------------------*/
-int readch() {
+int readch(void) {
   char    ch;
   int ret=0;
  if(peek_character != -1) {
@@ -87,8 +87,8 @@ int readch() {
   return ch;
 }
 
-void resetch() {
-//Clear ch  
+void resetch(void) {
+//Clear ch
   term.c_cc[VMIN] = 0;
   tcsetattr(0, TCSANOW, &term);
   peek_character = 0;
@@ -137,16 +137,16 @@ void screencol(int x) {
 /*-----------------------*/
 void resetAnsi(int x) {
   switch (x) {
-    case 0:			//reset all colors and attributes
+    case 0:         //reset all colors and attributes
       printf("%c[0m", 0x1b);
       break;
-    case 1:			//reset only attributes
+    case 1:         //reset only attributes
       printf("%c[20m", 0x1b);
       break;
-    case 2:			//reset foreg. colors and not attrib.
+    case 2:         //reset foreg. colors and not attrib.
       printf("%c[39m", 0x1b);
       break;
-    case 3:			//reset back. colors and not attrib.
+    case 3:         //reset back. colors and not attrib.
       printf("%c[49m", 0x1b);
       break;
     default:
@@ -167,13 +167,13 @@ int get_terminal_dimensions(int *rows, int *columns) {
 /*--------------------------*/
 /* Ansi function hide cursor*/
 /*--------------------------*/
-void hidecursor() {
+void hidecursor(void) {
   printf("\e[?25l");
 }
 
 /*--------------------------*/
 /* Ansi function show cursor*/
 /*--------------------------*/
-void showcursor() {
+void showcursor(void) {
   printf("\e[?25h");
 }

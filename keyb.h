@@ -1,11 +1,11 @@
 /*
 ========================================================================
-- HEADER - 
+- HEADER -
 Module to handle keyboard input in Linux and create
 a further layer of abstraction.
 @author : Velorek
-@version : 1.0  
-Last modified: 14/04/2019 Rename Headers                                                                
+@version : 1.0
+Last modified: 14/04/2019 Rename Headers
 ========================================================================
 */
 
