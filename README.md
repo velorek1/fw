@@ -1,15 +1,16 @@
 # fw - FilevieWer
 
-TUI fileViewer in C for Unix Systems - no dependencies
+RETRO TUI fileViewer in C for Unix Systems - no dependencies
 MIT licence
 
-TO BUILD AND RUN:
+* TO BUILD AND RUN:
 
     * Download or clone repository.
     * Type "make" and "./fw" to run.
     * Alternatively, compile with "bash build.sh".
     
-FEATURES:
+
+* FEATURES:
 - Millisecond timer for animations.
 - Rudimentary screen buffer. 
 - Dynamic screen resizing.
@@ -18,6 +19,6 @@ FEATURES:
 - Open File Dialog with recursive filelisting.
 - ESC Key sequence managements.
 
-SCREENCAPTURE:
+* SCREENCAPTURE:
 
 ![Alt text](fw.png?raw=true "Demo")
