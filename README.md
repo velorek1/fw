@@ -18,4 +18,6 @@ FEATURES:
 - Open File Dialog with recursive filelisting.
 - ESC Key sequence managements.
 
+SCREENCAPTURE:
+
 ![Alt text](fw.png?raw=true "Demo")
