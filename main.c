@@ -461,7 +461,7 @@ if (filePtr != NULL) {
 		  ch=32;
 		}
  		else{
-		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,BH_BLUE,F_WHITE);
+		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,BH_BLUE,FH_WHITE);
 		  i++;
 		}
 	  }
@@ -509,7 +509,7 @@ if (filePtr != NULL) {
 
       while (!feof(filePtr)) {
 	  ch = getc(filePtr);
-	  outputcolor(F_WHITE,BH_BLUE);
+	  outputcolor(FH_WHITE,BH_BLUE);
 	  wherex = labs(i-currentColumn); 
           if (wherex < scW-1) gotoxy(labs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
@@ -899,7 +899,11 @@ char cmsg[31] = "\nFile vieWer. Coded by v3l0r3k\n";
         printf("%s",about_msg[i]);
   }
  }
-
+if (openFileData.itemIndex != 0) {
+    free(openFileData.item);
+    free(openFileData.path);
+  }
+ free_buffer();
  resetTerm();
  outputcolor(B_BLUE,F_WHITE);
  gotoxy(((scW/2)-10),1);
