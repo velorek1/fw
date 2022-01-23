@@ -601,6 +601,11 @@ char *ok=NULL;
       //display open file dialog if file does not exist
       strcpy(currentPath, "\0");
       openFileDialog(&openFileData);
+      if (openFileData.itemIndex == 0) {
+        strcpy(currentPath, "No file to open!");
+        strcpy(fwfileName, "No file to open!");
+        return 0;
+      }
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
         strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
@@ -616,6 +621,12 @@ char *ok=NULL;
 	//display open file dialog if no arguments are given
       strcpy(currentPath, "\0");
       openFileDialog(&openFileData);
+      if (openFileData.itemIndex == 0) {
+        strcpy(currentPath, "No file to open!");
+        strcpy(fwfileName, "No file to open!");
+        return 0;
+      }
+ 
       if (strcmp(openFileData.path, "\0") != 0 && file_exists(openFileData.path)){
         strcpy(currentPath, openFileData.fullPath);
         strcpy(fwfileName, openFileData.path);
