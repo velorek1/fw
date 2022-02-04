@@ -192,7 +192,7 @@ int keypressed=0;
 
 void main_screen(){
 int i=0;
-   screen_color(BH_BLUE);
+   screen_color(B_BLUE);
   for (i=1;i<scW; i++){
        write_ch(i,1,' ',B_BLUE,F_BLUE);
        write_ch(i,2,' ',B_WHITE,F_WHITE);
@@ -215,7 +215,7 @@ int i=0;
   update_indicators();
   if (displayLogo == 1){
   for (i=0; i<ABOUT_LINES; i++)
-	write_str((scW/2) - (80/2), ((scH/2) - (ABOUT_LINES/2)) + i, about_msg[i], BH_BLUE, F_WHITE);
+	write_str((scW/2) - (80/2), ((scH/2) - (ABOUT_LINES/2)) + i, about_msg[i], B_BLUE, F_WHITE);
   }
   update_screen();
 }
@@ -337,6 +337,7 @@ int special_keys(char ch) {
      drop_down(&kglobal);
     } else if(strcmp(chartrail, K_F1_TRAIL) == 0 ||
 	      strcmp(chartrail, K_F1_TRAIL2) == 0) {
+      filetoDisplay(filePtr,  1);
       help_info(); 
       // ARROW KEYS
     } else if((strcmp(chartrail, K_LEFT_TRAIL) == 0) && filePtr != NULL ) {
@@ -376,9 +377,11 @@ int special_keys(char ch) {
 	if (currentColumn > 1) cleanArea(1);
 	scroll(filePtr);
      } else if(strcmp(chartrail, K_ALT_F) == 0) {
+      filetoDisplay(filePtr,  1);
       data.index=FILE_MENU;
       drop_down(&kglobal);	//animation   
     } else if(strcmp(chartrail, K_ALT_H) == 0) {
+      filetoDisplay(filePtr,  1);
       data.index=HELP_MENU;
       drop_down(&kglobal);	//animation  
     } else if(strcmp(chartrail, K_ALT_I) == 0) {
@@ -454,21 +457,21 @@ if (filePtr != NULL) {
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9){ //for convenience TAB char is shown in green
 			 //with horizontal scroll
-			 if (i> currentColumn) write_ch(wherex,lineCounter+4,'>',BH_GREEN,F_WHITE);
+			 if (i> currentColumn) write_ch(wherex,lineCounter+4,'>',B_GREEN,F_WHITE);
 			 i++;
 		} else if (ch==13){
 		//windows 0x0d is transform to 0x20 
 		  ch=32;
 		}
  		else{
-		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,BH_BLUE,FH_WHITE);
+		  if (i> currentColumn) write_ch(wherex,lineCounter+4,ch,B_BLUE,F_WHITE);
 		  i++;
 		}
 	  }
 	  if(ch == END_LINE_CHAR) { 
 		//next line
 	    for (k=i; k<scW; k++){
-		write_ch(k,lineCounter+4,' ',BH_BLUE,F_BLUE);
+		write_ch(k,lineCounter+4,' ',B_BLUE,F_BLUE);
 		}
 	    lineCounter++;
 	    i=1;
@@ -477,7 +480,7 @@ if (filePtr != NULL) {
 	  if (lineCounter > scH-6) break;
     }
     //to delete the last 0x0A character on screen
-    write_ch(i-1,lineCounter+4,' ',BH_BLUE,F_BLUE);
+    write_ch(i-1,lineCounter+4,' ',B_BLUE,F_BLUE);
   //display metrics
   write_str(1,scH-1,"- Lines:         | - Progress:    %  | - H:    /500", B_BLACK, F_WHITE); 
   progress = ((double) currentLine / (double) scrollLimit) * 100;
@@ -490,7 +493,7 @@ if (filePtr != NULL) {
   write_str(scW - strlen(time_str),2,time_str,B_WHITE,F_BLACK);
   //clean viewing area
   //write to screen buffer
-  if (scupdate==1) update_screen();
+  if (scupdate==1) {update_screen();}
 }
 }
 
@@ -509,13 +512,13 @@ if (filePtr != NULL) {
 
       while (!feof(filePtr)) {
 	  ch = getc(filePtr);
-	  outputcolor(FH_WHITE,BH_BLUE);
+	  outputcolor(F_WHITE,B_BLUE);
 	  wherex = labs(i-currentColumn); 
           if (wherex < scW-1) gotoxy(labs(i-currentColumn),lineCounter+4);
           if (ch != END_LINE_CHAR && ch != '\0') {
 		if (ch==9){
 			//for convenience TAB char is shown in green
-	  		outputcolor(F_WHITE,BH_GREEN);
+	  		outputcolor(F_WHITE,B_GREEN);
 			if (i> currentColumn) printf(">");
 			i++;
 		} else if (ch==13){
@@ -532,7 +535,7 @@ if (filePtr != NULL) {
 	   //next line
 	   printf("%c",32);
 	   for (k=i; k<=scW; k++){	
-    		outputcolor(F_BLUE,BH_BLUE);
+    		outputcolor(F_BLUE,B_BLUE);
 		gotoxy(k,lineCounter+4);
 		printf("%c",32);
 		}
@@ -544,7 +547,7 @@ if (filePtr != NULL) {
     }
   //delete last 0x0a
   gotoxy(i-1,lineCounter+4);
-  outputcolor(F_BLUE,BH_BLUE);
+  outputcolor(F_BLUE,B_BLUE);
   printf(" ");
   //metrics
   gotoxy(1,scH-1);
@@ -571,7 +574,7 @@ int i,j;
    if (raw == 1) {
    for(j=4; j<scH-1;j++)
         for (i=1; i<=scW; i++){
-    	  outputcolor(F_BLUE,BH_BLUE);
+    	  outputcolor(F_BLUE,B_BLUE);
 	  gotoxy(i,j);
   	  printf("%c",32);
         }
@@ -579,7 +582,7 @@ int i,j;
    else{
    for(j=4; j<scH-1;j++)
         for (i=1; i<=scW; i++){
-    	  write_ch(i,j,' ',F_BLUE,BH_BLUE);
+    	  write_ch(i,j,' ',F_BLUE,B_BLUE);
         }
 }
 }
@@ -905,7 +908,7 @@ char cmsg[31] = "\nFile vieWer. Coded by v3l0r3k\n";
   cleanArea(1);
  if (displayLogo ==1){
   for (i=0; i<ABOUT_LINES; i++){
-	outputcolor(F_WHITE, BH_BLUE);
+	outputcolor(F_WHITE, B_BLUE);
 	gotoxy((scW/2) - (80/2), ((scH/2) - (ABOUT_LINES/2)) + i);
         printf("%s",about_msg[i]);
   }
@@ -944,10 +947,10 @@ if (openFileData.itemIndex != 0) {
      } else {
       gotoxy(j,scH-2); 
       //outputcolor(B_BLACK,F_WHITE);
-      outputcolor(FH_BLUE,B_BLACK);
+      outputcolor(F_BLUE,B_BLACK);
       if (j<30) {
 	if (j== 1 || j== 9)  printf("%c\n",cmsg[j]);   
-        if (j> 22) {outputcolor(FH_BLACK,B_BLACK); printf("%c\n",cmsg[j]);}      
+        if (j> 22) {outputcolor(F_BLACK,B_BLACK); printf("%c\n",cmsg[j]);}      
       }
       j++;
       }  
