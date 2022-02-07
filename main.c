@@ -950,7 +950,7 @@ if (openFileData.itemIndex != 0) {
       outputcolor(F_BLUE,B_BLACK);
       if (j<30) {
 	if (j== 1 || j== 9)  printf("%c\n",cmsg[j]);   
-        if (j> 22) {outputcolor(F_BLACK,B_BLACK); printf("%c\n",cmsg[j]);}      
+        if (j> 22) {outputcolor(FH_BLACK,B_BLACK); printf("%c\n",cmsg[j]);}      
       }
       j++;
       }  
