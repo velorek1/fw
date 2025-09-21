@@ -3,6 +3,8 @@
 RETRO TUI fileViewer in C for Unix Systems - no dependencies
 MIT licence
 
+A more polished implementation of a text file viewer here : https://github.com/velorek1/fread
+
 - TO BUILD AND RUN:
 
     * Download or clone repository.
